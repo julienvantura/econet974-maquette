@@ -2,7 +2,7 @@
   "use strict";
   var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ————— Données services ————— */
+  /* ----- Données services ----- */
   var IMGS = {
     mops: "assets/img/mops.jpg",
     commercial: "assets/img/commercial.jpg",
@@ -16,7 +16,7 @@
   };
   var SERVICES = [
     { slug:"nettoyage-commercial", name:"Nettoyage commercial", img:"commercial", tag:"Le plus demandé",
-      short:"Bureaux, espaces de travail et boutiques — sols, vitres, mobilier, sanitaires.",
+      short:"Bureaux, espaces de travail et boutiques - sols, vitres, mobilier, sanitaires.",
       lead:"Nettoyage quotidien ou périodique de vos bureaux, espaces de travail et boutiques : sols, vitres, mobilier, sanitaires et espaces communs, aux horaires qui respectent votre activité.",
       freq:"Quotidien, hebdomadaire ou ponctuel", pub:"Entreprises, commerces, professions libérales",
       checks:["Sols, vitres, mobilier, sanitaires et espaces communs","Produits écolabellisés inclus, sans surcoût","Horaires adaptés : tôt le matin, soir, week-end","Interventions ponctuelles et évènementielles","Réassort des consommables (savon, papier…)","Interlocuteur unique et contrôles qualité"] },
@@ -42,22 +42,22 @@
       checks:["Taille de haies et d'arbustes","Tonte et soin des pelouses","Désherbage sans produits chimiques agressifs","Outils électriques peu bruyants","Techniques inspirées de la permaculture","Évacuation et valorisation des déchets verts"] },
     { slug:"valorisation-dechets", name:"Valorisation des déchets", img:"tri", tag:"Économie circulaire",
       short:"Bennes, bacs de tri sélectif et cendriers : vos déchets deviennent des ressources.",
-      lead:"Facilitez la gestion de vos déchets : bennes pour les volumes importants, bacs de tri sélectif dans vos locaux, cendriers extérieurs — et une vraie filière de valorisation derrière.",
+      lead:"Facilitez la gestion de vos déchets : bennes pour les volumes importants, bacs de tri sélectif dans vos locaux, cendriers extérieurs - et une vraie filière de valorisation derrière.",
       freq:"Mise en place + collecte régulière", pub:"Entreprises, chantiers, copropriétés, collectivités",
       checks:["Mise à disposition de bennes","Installation de bacs de tri sélectif","Cendriers extérieurs contre les mégots","Collecte et pesée par flux de déchets","Filières de recyclage réunionnaises agréées","Reporting pour vos bilans RSE"] },
     { slug:"bailleurs-particuliers", name:"Bailleurs & particuliers", img:"bailleurs", tag:"Clé en main",
       short:"Fin de location, remise en état, grand ménage ou entretien régulier.",
-      lead:"Nettoyage de fin de location et remise en état complète des logements avant l'arrivée ou après le départ des locataires — ou entretien régulier à votre rythme.",
+      lead:"Nettoyage de fin de location et remise en état complète des logements avant l'arrivée ou après le départ des locataires - ou entretien régulier à votre rythme.",
       freq:"Ponctuel ou régulier, à votre rythme", pub:"Bailleurs privés, agences, particuliers",
       checks:["Nettoyage complet de fin de location","Remise en état entre deux locataires","Grand ménage ponctuel en profondeur","Entretien régulier adapté à votre rythme","Vitres, sols, cuisine, sanitaires","État des lieux facilité, photos à l'appui"] },
     { slug:"collectivites", name:"Collectivités", img:"collectivites", tag:"Marchés publics",
       short:"Mairies, écoles, crèches, gymnases et équipements publics.",
-      lead:"Nettoyage des bâtiments publics — mairies, écoles, crèches, bibliothèques, salles polyvalentes — et entretien des infrastructures sportives, avec des produits adaptés à la santé des plus jeunes.",
+      lead:"Nettoyage des bâtiments publics - mairies, écoles, crèches, bibliothèques, salles polyvalentes - et entretien des infrastructures sportives, avec des produits adaptés à la santé des plus jeunes.",
       freq:"Contrats annuels ou marchés publics", pub:"Mairies, intercommunalités, établissements publics",
       checks:["Écoles et crèches : produits adaptés aux enfants","Salles de classe, réfectoires, sanitaires","Gymnases, vestiaires et terrains sportifs","Désinfection des zones à fort passage","Mémoire technique pour vos marchés publics","Équipes stables et identifiées"] }
   ];
 
-  /* ————— Injection cartes services ————— */
+  /* ----- Injection cartes services ----- */
   function cardHTML(s){
     return '<a class="scard rv" href="#/services/' + s.slug + '">' +
       '<span class="ph"><img loading="lazy" src="' + IMGS[s.img] + '" alt="' + s.name + '"><span class="tag">' + s.tag + '</span></span>' +
@@ -73,7 +73,7 @@
     return '<button class="chip" data-need="' + s.name + '">' + s.name + '</button>';
   }).join("");
 
-  /* ————— Router ————— */
+  /* ----- Router ----- */
   var pages = document.querySelectorAll(".page");
   var toast = document.getElementById("toast"), toastTmr;
   function notify(msg){
@@ -132,7 +132,7 @@
   }
   addEventListener("hashchange", route);
 
-  /* ————— Reveal on scroll ————— */
+  /* ----- Reveal on scroll ----- */
   var io = new IntersectionObserver(function(es){
     es.forEach(function(e){
       if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
@@ -142,11 +142,11 @@
     page.querySelectorAll(".rv:not(.in)").forEach(function(el){ io.observe(el); });
   }
 
-  /* ————— Header ombre ————— */
+  /* ----- Header ombre ----- */
   var hdr = document.getElementById("hdr");
   addEventListener("scroll", function(){ hdr.classList.toggle("scrolled", scrollY > 8); }, {passive:true});
 
-  /* ————— Menu mobile ————— */
+  /* ----- Menu mobile ----- */
   var mnav = document.getElementById("mnav");
   function closeMenu(){ mnav.classList.remove("open"); mnav.setAttribute("aria-hidden","true"); }
   document.getElementById("burger").addEventListener("click", function(){
@@ -155,7 +155,7 @@
   document.getElementById("mclose").addEventListener("click", closeMenu);
   document.getElementById("mveil").addEventListener("click", closeMenu);
 
-  /* ————— Bulles hero ————— */
+  /* ----- Bulles hero ----- */
   if (!reduced) {
     var bw = document.getElementById("bubbles");
     for (var i = 0; i < 14; i++) {
@@ -170,7 +170,7 @@
     }
   }
 
-  /* ————— Compteurs ————— */
+  /* ----- Compteurs ----- */
   var cio = new IntersectionObserver(function(es){
     es.forEach(function(e){
       if (!e.isIntersecting) return;
@@ -188,7 +188,7 @@
   }, {threshold:.7});
   document.querySelectorAll("[data-count]").forEach(function(el){ cio.observe(el); });
 
-  /* ————— Avant / après ————— */
+  /* ----- Avant / après ----- */
   var ba = document.getElementById("ba");
   function baMove(clientX){
     var r = ba.getBoundingClientRect();
@@ -204,7 +204,7 @@
     ba.addEventListener("pointerup", up);
   });
 
-  /* ————— Wizard devis ————— */
+  /* ----- Wizard devis ----- */
   var wiz = { step:1, who:null, needs:[], freq:null };
   var steps = document.querySelectorAll(".wstep");
   function showStep(n){
@@ -214,8 +214,8 @@
     document.getElementById("wiz-fill").style.width = (n * 25) + "%";
     if (n === 4) {
       document.getElementById("recap").innerHTML =
-        '<div><span>Profil</span><b>' + (wiz.who || "—") + '</b></div>' +
-        '<div><span>Besoin</span><b>' + (wiz.needs.join(", ") || "—") + '</b></div>' +
+        '<div><span>Profil</span><b>' + (wiz.who || "-") + '</b></div>' +
+        '<div><span>Besoin</span><b>' + (wiz.needs.join(", ") || "-") + '</b></div>' +
         '<div><span>Commune</span><b>' + document.getElementById("d-commune").value + '</b></div>' +
         '<div><span>Surface</span><b>' + document.getElementById("d-surface").value + '</b></div>' +
         '<div><span>Fréquence</span><b>' + (wiz.freq || "À définir") + '</b></div>';
@@ -257,7 +257,7 @@
     var nom = document.getElementById("d-nom").value.trim();
     var tel = document.getElementById("d-tel").value.trim();
     if (!nom || !tel) { notify("Indiquez au moins votre nom et votre téléphone."); return; }
-    notify("Maquette de démonstration — sur le site final, votre demande partirait directement chez EcoNet ✅");
+    notify("Maquette de démonstration - sur le site final, votre demande partirait directement chez EcoNet ✅");
   });
 
   /* ═════════ Agenda / RDV + Espace pro ═════════ */
@@ -277,15 +277,15 @@
       {id:"s1", d:d(0), t:"09:00", service:"Nettoyage commercial", name:"SARL Horizon Bureaux", tel:"0692 11 22 33", commune:"Saint-Denis", status:"confirme"},
       {id:"s2", d:d(0), t:"14:00", service:"Résidentiel & copropriétés", name:"Syndic Les Filaos", tel:"0692 44 55 66", commune:"Sainte-Marie", status:"confirme"},
       {id:"s3", d:d(1), t:"10:00", service:"Milieux médicalisés", name:"Cabinet dentaire Grondin", tel:"0692 77 88 99", commune:"Saint-Denis", status:"confirme"},
-      {id:"s4", d:d(1), t:"15:00", service:"Collectivités", name:"Mairie annexe — gymnase", tel:"0262 45 67 89", commune:"Le Port", status:"attente"},
+      {id:"s4", d:d(1), t:"15:00", service:"Collectivités", name:"Mairie annexe - gymnase", tel:"0262 45 67 89", commune:"Le Port", status:"attente"},
       {id:"s5", d:d(2), t:"08:00", service:"Post-chantier & industriel", name:"Villa Ermitage (livraison)", tel:"0693 12 34 56", commune:"Saint-Paul", status:"confirme"},
       {id:"s6", d:d(2), t:"10:00", service:"Résidentiel & copropriétés", name:"Résidence Les Alizés", tel:"0692 10 20 30", commune:"Saint-Denis", status:"confirme"},
       {id:"s7", d:d(2), t:"10:00", service:"Milieux médicalisés", name:"Dr Hoarau (saisie téléphone)", tel:"0693 99 88 77", commune:"Sainte-Suzanne", status:"attente"},
       {id:"s8", d:d(3), t:"11:00", service:"Entretien des espaces verts", name:"Copropriété Grand Baie", tel:"0692 55 44 33", commune:"Saint-Paul", status:"confirme"},
-      {id:"s9", d:d(4), t:"09:00", service:"Bailleurs & particuliers", name:"Fin de location — T3", tel:"0693 65 43 21", commune:"Saint-Pierre", status:"attente"},
+      {id:"s9", d:d(4), t:"09:00", service:"Bailleurs & particuliers", name:"Fin de location - T3", tel:"0693 65 43 21", commune:"Saint-Pierre", status:"attente"},
       {id:"s10", d:d(5), t:"08:00", service:"Nettoyage commercial", name:"Boutique Cœur de Ville", tel:"0692 24 68 10", commune:"Saint-Denis", status:"confirme"},
       {id:"s11", d:d(7), t:"10:00", service:"Collectivités", name:"École Les Badamiers", tel:"0262 33 22 11", commune:"La Possession", status:"confirme"},
-      {id:"s12", d:d(9), t:"14:00", service:"Valorisation des déchets", name:"Zone artisanale — bennes", tel:"0693 31 41 59", commune:"Le Port", status:"confirme"}
+      {id:"s12", d:d(9), t:"14:00", service:"Valorisation des déchets", name:"Zone artisanale - bennes", tel:"0693 31 41 59", commune:"Le Port", status:"confirme"}
     ]};
   }
   var agMem = null;
@@ -305,7 +305,7 @@
   function isTaken(d, t){ return actifs().some(function(b){ return b.d === d && b.t === t; }); }
   function syncState(){ try { return JSON.parse(localStorage.getItem(AG_SYNC)) || {}; } catch(e){ return {}; } }
 
-  /* ————— Page RDV (client) ————— */
+  /* ----- Page RDV (client) ----- */
   var rdvSel = { service: SERVICES[0].name, d: null, t: null };
   function nextDays(){
     var out = [], x = new Date();
@@ -341,7 +341,7 @@
     var tel = document.getElementById("r-tel").value.trim();
     if (!rdvSel.t) { notify("Choisissez d'abord un créneau disponible 🙂"); return; }
     if (!nom || !tel) { notify("Indiquez votre nom et votre téléphone."); return; }
-    if (isTaken(rdvSel.d, rdvSel.t)) { notify("Ce créneau vient d'être réservé — choisissez-en un autre."); rdvSel.t = null; renderRdv(); return; }
+    if (isTaken(rdvSel.d, rdvSel.t)) { notify("Ce créneau vient d'être réservé - choisissez-en un autre."); rdvSel.t = null; renderRdv(); return; }
     var data = agRead();
     var b = { id: "u" + Date.now(), d: rdvSel.d, t: rdvSel.t, service: rdvSel.service, name: nom, tel: tel,
               commune: document.getElementById("r-commune").value, status: "attente", src: "site" };
@@ -362,7 +362,7 @@
     renderRdv();
   });
 
-  /* ————— Espace pro ————— */
+  /* ----- Espace pro ----- */
   var adminWeek = 0;
   function isAuthed(){ try { return sessionStorage.getItem("econet_admin") === "1"; } catch(e){ return false; } }
   function renderAdmin(){
@@ -396,13 +396,13 @@
       var other = cfl ? list.find(function(x){ return x.id !== b.id && x.d === b.d && x.t === b.t && x.status === "confirme"; }) : null;
       return '<div class="demand' + (cfl ? " conflict" : "") + '">' +
         '<div class="d-top"><b>' + b.name + '</b><span class="when">' + fmtD(b.d) + ' · ' + b.t + '</span></div>' +
-        '<div class="d-meta">' + b.service + ' — ' + b.commune + ' · ' + b.tel + '</div>' +
-        (cfl ? '<span class="badge-conf">⚠ Conflit — créneau déjà confirmé pour ' + other.name + '</span>' : '') +
+        '<div class="d-meta">' + b.service + ' - ' + b.commune + ' · ' + b.tel + '</div>' +
+        (cfl ? '<span class="badge-conf">⚠ Conflit - créneau déjà confirmé pour ' + other.name + '</span>' : '') +
         '<div class="d-actions">' +
         '<button class="abtn ok" data-conf="' + b.id + '"' + (cfl ? ' disabled title="Résolvez le conflit d\'abord"' : '') + '>Confirmer</button>' +
         '<button class="abtn no" data-ref="' + b.id + '">' + (cfl ? "Proposer un autre créneau" : "Refuser") + '</button>' +
         '</div></div>';
-    }).join("") : '<p style="color:var(--faint);font-size:14px">Aucune demande en attente — tout est traité ✅</p>';
+    }).join("") : '<p style="color:var(--faint);font-size:14px">Aucune demande en attente - tout est traité ✅</p>';
     var lbl = "Semaine du " + fmtD(isoD(mon)) + " au " + fmtD(isoD(wkEnd));
     document.getElementById("a-wlbl").textContent = adminWeek === 0 ? lbl + " (courante)" : lbl;
     var html = '<div></div>';
@@ -419,7 +419,7 @@
       list.filter(function(b){ return b.d === di; }).forEach(function(b){
         var top = (parseInt(b.t, 10) - 8) * 44 + 2;
         var cls = b.status === "confirme" ? "ok" : (hasConflict(b) ? "cfl" : "att");
-        html += '<div class="plan-block ' + cls + '" style="top:' + top + 'px" data-info="' + b.name + ' — ' + b.service + ' (' + b.t + ', ' + b.commune + ')">' + b.t + ' ' + b.name + '<small>' + b.service + '</small></div>';
+        html += '<div class="plan-block ' + cls + '" style="top:' + top + 'px" data-info="' + b.name + ' - ' + b.service + ' (' + b.t + ', ' + b.commune + ')">' + b.t + ' ' + b.name + '<small>' + b.service + '</small></div>';
       });
       html += '</div>';
     }
@@ -441,7 +441,7 @@
       renderAdmin();
       notify("Bienvenue dans votre espace pro 👋");
     } else {
-      notify("Code incorrect — pour la démo : 9744");
+      notify("Code incorrect - pour la démo : 9744");
     }
   }
   document.getElementById("pin-go").addEventListener("click", pinTry);
@@ -452,11 +452,11 @@
       if (el.disabled) return;
       var data = agRead();
       var b = data.bookings.find(function(x){ return x.id === el.dataset.conf; });
-      if (b) { b.status = "confirme"; agWrite(data); notify("RDV confirmé — le client est prévenu par SMS/e-mail (démo) ✅"); }
+      if (b) { b.status = "confirme"; agWrite(data); notify("RDV confirmé - le client est prévenu par SMS/e-mail (démo) ✅"); }
     } else if ((el = e.target.closest("[data-ref]"))) {
       var data2 = agRead();
       var b2 = data2.bookings.find(function(x){ return x.id === el.dataset.ref; });
-      if (b2) { b2.status = "refuse"; agWrite(data2); notify("Créneau libéré — le client est invité à en choisir un autre (démo)"); }
+      if (b2) { b2.status = "refuse"; agWrite(data2); notify("Créneau libéré - le client est invité à en choisir un autre (démo)"); }
     } else if ((el = e.target.closest("[data-sync]"))) {
       var st = syncState();
       st[el.dataset.sync] = !st[el.dataset.sync];
@@ -472,7 +472,7 @@
     try { localStorage.removeItem(AG_KEY); } catch(e){}
     agMem = null; adminWeek = 0;
     agRender();
-    notify("Démo réinitialisée — agenda d'exemple rechargé");
+    notify("Démo réinitialisée - agenda d'exemple rechargé");
   });
 
   /* live entre onglets : le storage event = notifications en direct */
@@ -484,7 +484,7 @@
     var adminOn = document.querySelector('[data-page="admin"]').classList.contains("on");
     if (adminOn && isAuthed() && now.length > before) {
       var nb = agMem.bookings[agMem.bookings.length - 1];
-      notify("🔔 Nouvelle demande de RDV — " + nb.name + " · " + fmtD(nb.d) + " à " + nb.t);
+      notify("🔔 Nouvelle demande de RDV - " + nb.name + " · " + fmtD(nb.d) + " à " + nb.t);
     }
     agRender();
   });
@@ -530,25 +530,25 @@
     return {
       client: { name: "Résidence Les Alizés", contact: "M. Lebreton (syndic)", site: "12 rue des Filaos, Saint-Denis · contrat annuel" },
       devis: [
-        { id: "DEV-2026-041", titre: "Entretien des parties communes — contrat annuel", date: dOff(-24), statut: "accepte",
+        { id: "DEV-2026-041", titre: "Entretien des parties communes - contrat annuel", date: dOff(-24), statut: "accepte",
           lignes: [["Entretien hebdomadaire hall, escaliers, ascenseur (46 sem.)", 46, 120], ["Vitrerie trimestrielle", 4, 180], ["Sortie et nettoyage des bacs (hebdo)", 46, 25]] },
         { id: "DEV-2026-052", titre: "Remise en état du parking souterrain", date: dOff(-6), statut: "attente",
           lignes: [["Décapage mécanique des sols (680 m²)", 1, 890], ["Évacuation des encombrants + tri", 1, 240]] }
       ],
       factures: [
-        { id: "FAC-2026-118", titre: "Entretien — août 2026", montant: 612.40, statut: "payee", date: dOff(-32) },
-        { id: "FAC-2026-131", titre: "Entretien — septembre 2026", montant: 612.40, statut: "due", echeance: dOff(9) }
+        { id: "FAC-2026-118", titre: "Entretien - août 2026", montant: 612.40, statut: "payee", date: dOff(-32) },
+        { id: "FAC-2026-131", titre: "Entretien - septembre 2026", montant: 612.40, statut: "due", echeance: dOff(9) }
       ],
       planning: [
-        { d: dOff(1), t: "06:00", dur: "2 h", titre: "Entretien hebdomadaire — hall A & escaliers", rec: "Hebdomadaire" },
-        { d: dOff(4), t: "09:00", dur: "3 h", titre: "Vitrerie — façade & entrée", rec: "Trimestriel" },
-        { d: dOff(8), t: "06:00", dur: "2 h", titre: "Entretien hebdomadaire — hall A & escaliers", rec: "Hebdomadaire" }
+        { d: dOff(1), t: "06:00", dur: "2 h", titre: "Entretien hebdomadaire - hall A & escaliers", rec: "Hebdomadaire" },
+        { d: dOff(4), t: "09:00", dur: "3 h", titre: "Vitrerie - façade & entrée", rec: "Trimestriel" },
+        { d: dOff(8), t: "06:00", dur: "2 h", titre: "Entretien hebdomadaire - hall A & escaliers", rec: "Hebdomadaire" }
       ],
-      photos: [["copro", "Hall A — après remise en état"], ["chantier", "Parking — décapage en cours"], ["mops", "Entretien hebdomadaire en cours"], ["tri", "Local poubelles — tri sélectif installé"]],
+      photos: [["copro", "Hall A - après remise en état"], ["chantier", "Parking - décapage en cours"], ["mops", "Entretien hebdomadaire en cours"], ["tri", "Local poubelles - tri sélectif installé"]],
       messages: [
         { from: "econet", txt: "Bonjour M. Lebreton ! L'intervention vitrerie est confirmée vendredi 9 h. L'équipe passera par l'entrée de service.", at: "Hier 14:32" },
         { from: "client", txt: "Parfait, le gardien sera prévenu. Pouvez-vous aussi regarder la tache dans l'ascenseur B ?", at: "Hier 15:04" },
-        { from: "econet", txt: "C'est noté — on la traite vendredi, sans supplément 👍", at: "Hier 15:11" }
+        { from: "econet", txt: "C'est noté - on la traite vendredi, sans supplément 👍", at: "Hier 15:11" }
       ]
     };
   }
@@ -591,7 +591,7 @@
       "<div><span>TVA 8,5 % (La Réunion)</span><b>" + eur(t.tva) + "</b></div>" +
       "<div class='ttc'><span>Total TTC</span><b>" + eur(t.ttc) + "</b></div></div>" +
       (d.statut === "attente"
-        ? "<div style='display:flex;gap:10px;flex-wrap:wrap'><button class='btn btn-p' style='flex:1' data-accept='" + d.id + "'>Accepter le devis</button><button class='btn btn-o' data-pdf='" + d.id + "'>Télécharger le PDF</button></div><p class='admin-note' style='text-align:center'>Signature électronique sur le site final — ceci est une démo.</p>"
+        ? "<div style='display:flex;gap:10px;flex-wrap:wrap'><button class='btn btn-p' style='flex:1' data-accept='" + d.id + "'>Accepter le devis</button><button class='btn btn-o' data-pdf='" + d.id + "'>Télécharger le PDF</button></div><p class='admin-note' style='text-align:center'>Signature électronique sur le site final - ceci est une démo.</p>"
         : "<div style='display:flex;gap:12px;align-items:center;flex-wrap:wrap'><span class='st-chip ok'>Devis accepté</span><button class='btn btn-o' data-pdf='" + d.id + "'>Télécharger le PDF</button></div>");
     mv.hidden = false;
   }
@@ -602,7 +602,7 @@
     if (!el) return;
     var p = ptRead();
     var d = p.devis.find(function(x){ return x.id === el.dataset.accept; });
-    if (d) { d.statut = "accepte"; ptWrite(p); mv.hidden = true; notify("Devis accepté — EcoNet est prévenu et planifie l'intervention (démo) ✅"); }
+    if (d) { d.statut = "accepte"; ptWrite(p); mv.hidden = true; notify("Devis accepté - EcoNet est prévenu et planifie l'intervention (démo) ✅"); }
   });
 
   /* rendu espace client */
@@ -661,13 +661,13 @@
       renderClient();
       notify("Bienvenue dans votre espace, M. Lebreton 👋");
     } else {
-      notify("Code incorrect — pour la démo : 2024");
+      notify("Code incorrect - pour la démo : 2024");
     }
   }
   document.getElementById("cl-app").addEventListener("click", function(e){
     var el;
     if ((el = e.target.closest("[data-devis]"))) openDevis(el.dataset.devis);
-    else if ((el = e.target.closest("[data-pay]"))) notify("Paiement en ligne branché à la mise en production (CB / prélèvement) — démo");
+    else if ((el = e.target.closest("[data-pay]"))) notify("Paiement en ligne branché à la mise en production (CB / prélèvement) - démo");
   });
   document.getElementById("cl-send").addEventListener("click", function(){
     var inp = document.getElementById("cl-msg");
@@ -679,7 +679,7 @@
     ptWrite(p);
     setTimeout(function(){
       var p2 = ptRead();
-      p2.messages.push({ from: "econet", txt: "Bien reçu ! L'équipe vous répond très vite. (réponse automatique — démo)", at: "À l'instant" });
+      p2.messages.push({ from: "econet", txt: "Bien reçu ! L'équipe vous répond très vite. (réponse automatique - démo)", at: "À l'instant" });
       ptWrite(p2);
     }, 1400);
   });
@@ -737,12 +737,12 @@
       document.getElementById("dv-titre").value = "";
       dvWrap.innerHTML = dvLineHTML("", 1, "");
       dvTotalsRender();
-      notify("Devis envoyé — visible immédiatement dans l'espace client ✅");
+      notify("Devis envoyé - visible immédiatement dans l'espace client ✅");
     });
     renderDevisAdmin();
   }
 
-  /* ————— PDF du devis (jsPDF + capability downloads) ————— */
+  /* ----- PDF du devis (jsPDF + capability downloads) ----- */
   function logoJpeg(){
     try {
       var img = document.querySelector(".logo-link img");
@@ -794,7 +794,7 @@
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9.5);
     doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-    doc.text(["Nettoyage professionnel écoresponsable", "Sylvain Dalleau — Directeur", "0693 85 68 99 · econet974@gmail.com", "Île de La Réunion"], ML, y + 6, {lineHeightFactor: 1.5});
+    doc.text(["Nettoyage professionnel écoresponsable", "Sylvain Dalleau - Directeur", "0693 85 68 99 · econet974@gmail.com", "Île de La Réunion"], ML, y + 6, {lineHeightFactor: 1.5});
 
     /* client */
     doc.setFillColor(231,244,251);
@@ -882,11 +882,11 @@
     doc.setFontSize(8.5);
     doc.setTextColor(GDARK[0],GDARK[1],GDARK[2]);
     doc.setFont("helvetica", "bold");
-    doc.text("EcoNet 974 — Le propre, naturellement.", W / 2, 287.5, {align:"center"});
+    doc.text("EcoNet 974 - Le propre, naturellement.", W / 2, 287.5, {align:"center"});
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7.2);
     doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-    doc.text("Document de démonstration — maquette VANTURA · contenus d'exemple · SIRET et mentions à compléter", W / 2, 292.5, {align:"center"});
+    doc.text("Document de démonstration - maquette VANTURA · contenus d'exemple · SIRET et mentions à compléter", W / 2, 292.5, {align:"center"});
     return doc;
   }
   window.__pdfTest = function(){
@@ -915,7 +915,7 @@
               notify("Devis " + d.id + " enregistré en PDF ✅");
             } catch(err) {
               if (err && err.code === "declined") notify("Téléchargement annulé.");
-              else if (err && err.code === "rate_limited") notify("Une demande est déjà ouverte — réessayez dans un instant.");
+              else if (err && err.code === "rate_limited") notify("Une demande est déjà ouverte - réessayez dans un instant.");
               else notify("Téléchargement indisponible dans cette vue.");
             }
           } else {
@@ -1062,6 +1062,6 @@
     setTimeout(done, 2300);
   })();
 
-  /* ————— Init ————— */
+  /* ----- Init ----- */
   route();
 })();

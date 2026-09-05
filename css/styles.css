@@ -63,12 +63,12 @@
   header.site.scrolled{box-shadow:var(--shadow)}
   .nav{display:flex;align-items:center;justify-content:space-between;height:78px;gap:20px}
   .logo-link{display:flex;align-items:center;gap:12px;flex:none}
-  .logo-link img{height:62px;width:auto}
-  .logo-txt{font-family:var(--display);font-weight:600;font-size:22px;line-height:1.05}
+  .logo-link img{height:52px;width:auto}
+  .logo-txt{font-family:var(--display);font-weight:600;font-size:20px;line-height:1.05}
   .logo-txt em{font-style:normal;color:var(--green-deep)}
   .logo-txt small{display:block;font-family:var(--body);font-weight:500;font-size:10.5px;color:var(--blue-deep);letter-spacing:.06em}
   .nav-links{display:flex;gap:6px}
-  .nav-links a{padding:9px 15px;border-radius:100px;font-weight:500;font-size:15px;color:var(--muted);transition:color .2s,background .2s;white-space:nowrap}
+  .nav-links a{padding:9px 12px;border-radius:100px;font-weight:500;font-size:14.5px;color:var(--muted);transition:color .2s,background .2s;white-space:nowrap}
   .nav-links a:hover{color:var(--ink);background:var(--green-pale)}
   .nav-links a.on{color:var(--green-dark);background:var(--green-pale);font-weight:600}
   .nav-cta{display:flex;align-items:center;gap:14px}
@@ -86,7 +86,6 @@
   .btn svg{width:16px;height:16px}
   .burger{display:none;width:44px;height:44px;border-radius:12px;place-items:center;background:var(--green-pale)}
   .burger svg{width:22px;height:22px;stroke:var(--green-dark);stroke-width:2.2;stroke-linecap:round}
-  @media(max-width:1400px){.nav-tel{display:none}}
   @media(max-width:1240px){.nav-links a{padding:9px 10px;font-size:14px}}
   @media(max-width:1160px){.nav-links a{padding:8px 7px;font-size:13.5px}.logo-txt small{display:none}}
   @media(max-width:1020px){.nav-links,.nav-tel{display:none}.burger{display:grid}}
