@@ -1,0 +1,11 @@
+# EcoNet 974
+
+> Entreprise de nettoyage professionnel écoresponsable à La Réunion (974). Bureaux, milieux médicalisés, copropriétés, collectivités, post-chantier, espaces verts, valorisation des déchets. Produits écolabellisés, devis gratuit sous 48 h, interventions 7 j/7 dans les 24 communes de l'île.
+
+Contact : 0693 85 68 99 · econet974@gmail.com
+Direction : Sylvain Dalleau
+
+## Pages
+- [Accueil](https://julienvantura.github.io/econet974-maquette/) : présentation, prise de rendez-vous, devis
+- Services : nettoyage commercial, milieux médicalisés, résidentiel et copropriétés, post-chantier et industriel, espaces verts, valorisation des déchets, bailleurs et particuliers, collectivités
+- Note : ce site est une maquette de démonstration réalisée par VANTURA ; contenus et chiffres d'exemple.

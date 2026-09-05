@@ -101,7 +101,7 @@
     }).join("");
     document.getElementById("sd-others").innerHTML = SERVICES.filter(function(x){ return x.slug !== slug; })
       .map(function(x){ return '<a href="#/services/' + x.slug + '">' + x.name + '</a>'; }).join("");
-    return s.name + " · EcoNet 974";
+    return s.name + " - Nettoyage à La Réunion · EcoNet 974";
   }
   function route(){
     var h = location.hash.replace(/^#\/?/, "");
@@ -645,7 +645,7 @@
         (f.statut === "due" ? "<span class='doc-act' data-pay='" + f.id + "'>Payer en ligne</span>" : "") + "</div>";
     }).join("");
     document.getElementById("cl-photos").innerHTML = p.photos.map(function(ph){
-      return "<figure><img src='" + IMGS[ph[0]] + "' alt='" + ph[1] + "'><figcaption>" + ph[1] + "</figcaption></figure>";
+      return "<figure><img loading='lazy' src='" + IMGS[ph[0]] + "' alt='" + ph[1] + "'><figcaption>" + ph[1] + "</figcaption></figure>";
     }).join("");
     var chat = document.getElementById("cl-chat");
     chat.innerHTML = p.messages.map(function(m){

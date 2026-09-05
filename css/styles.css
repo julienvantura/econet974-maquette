@@ -1,11 +1,11 @@
-/* ————— EcoNet 974 — identité tirée du logo : bleu bouteille, vert pomme ————— */
+/* = EcoNet 974 = identité tirée du logo : bleu bouteille, vert pomme = */
   :root{
     --blue:#0E8AC2; --blue-deep:#0A6FA3; --blue-ink:#0B5C87;
     --blue-pale:#E7F4FB; --blue-soft:#CFE9F7;
     --green:#7DB63F; --green-deep:#55923C; --green-dark:#3F7A2E;
     --green-pale:#EFF6E4; --green-soft:#DDEDC4;
     --sun:#F6EC9B;
-    --ink:#1B2A21; --muted:#5C7062; --faint:#8CA192;
+    --ink:#1B2A21; --muted:#51665A; --faint:#74897C;
     --bg:#FAFCF7; --white:#FFFFFF; --line:#E3EBDD; --line-2:#D3E0CB;
     --shadow:0 10px 30px rgba(27,42,33,.08);
     --shadow-lg:0 24px 60px rgba(27,42,33,.13);
@@ -50,7 +50,7 @@
   .map-flex>*,.engage-grid>*,.about-hero>*,.split>*,.story .wrap>*,.hero .wrap>*{min-width:0}
   .day-scroll,.chips-sel{max-width:100%}
 
-  /* ————— Topbar ————— */
+  /* = Topbar = */
   .topbar{background:var(--green-dark);color:#EFF7E6;font-size:13.5px}
   .topbar .wrap{display:flex;justify-content:space-between;align-items:center;min-height:38px;gap:16px}
   .topbar b{font-weight:600}
@@ -58,7 +58,7 @@
   .topbar a:hover{text-decoration:underline}
   @media(max-width:760px){.topbar .tb-left{display:none}.topbar .wrap{justify-content:center}}
 
-  /* ————— Header ————— */
+  /* = Header = */
   header.site{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:box-shadow .3s}
   header.site.scrolled{box-shadow:var(--shadow)}
   .nav{display:flex;align-items:center;justify-content:space-between;height:78px;gap:20px}
@@ -103,7 +103,7 @@
   .mnav .close{align-self:flex-end;width:40px;height:40px;border-radius:50%;background:var(--green-pale);display:grid;place-items:center;margin-bottom:10px}
   .mnav .panel .btn{margin-top:14px}
 
-  /* ————— Pages / routeur ————— */
+  /* = Pages / routeur = */
   .page{display:none}
   .page.on{display:block;animation:pageIn .5s cubic-bezier(.22,1,.36,1)}
   @keyframes pageIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
@@ -119,7 +119,7 @@
   .s-head.center{margin-inline:auto;text-align:center}
   .s-head.center p{margin-inline:auto}
 
-  /* ————— Hero accueil ————— */
+  /* = Hero accueil = */
   .hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#F2F9FC 0%,var(--bg) 90%)}
   .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(30px,5vw,70px);align-items:center;padding-top:clamp(40px,6vw,80px);padding-bottom:clamp(48px,7vw,96px)}
   .hero h1{font-size:clamp(34px,5vw,58px);font-weight:600;margin-top:18px}
@@ -159,7 +159,7 @@
   .publics .lbl{font-size:13.5px;font-weight:700;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
   .publics .chip{font-weight:600;font-size:14px;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:100px;padding:8px 16px}
 
-  /* ————— Cartes services ————— */
+  /* = Cartes services = */
   .sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
   @media(max-width:1020px){.sgrid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:560px){.sgrid{grid-template-columns:1fr}}
@@ -183,7 +183,7 @@
   .scard .more svg{width:15px;height:15px;transition:transform .25s}
   .scard:hover .more svg{transform:translateX(4px)}
 
-  /* ————— Avant / Après ————— */
+  /* = Avant / Après = */
   .ba-sect{background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
   .ba-wrap{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-lg);user-select:none;touch-action:none;aspect-ratio:16/8.5;max-height:520px}
   .ba-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
@@ -204,7 +204,7 @@
   .ba-lab.ap{right:16px;background:rgba(85,146,60,.85)}
   .ba-hint{text-align:center;margin-top:18px;color:var(--muted);font-size:14.5px;font-weight:500}
 
-  /* ————— Chiffres ————— */
+  /* = Chiffres = */
   .stats{background:var(--grad);color:#fff;position:relative;overflow:hidden}
   .stats::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:rgba(255,255,255,.08);top:-200px;right:-100px}
   .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:clamp(44px,5vw,64px) 0;position:relative}
@@ -214,7 +214,7 @@
   .stat .lbl{margin-top:8px;font-size:13.5px;font-weight:600;opacity:.92}
   @media(max-width:760px){.stats-grid{grid-template-columns:repeat(2,1fr);gap:22px 8px}}
 
-  /* ————— Méthode ————— */
+  /* = Méthode = */
   .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:st}
   @media(max-width:900px){.steps{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:540px){.steps{grid-template-columns:1fr}}
@@ -223,7 +223,7 @@
   .step h3{font-size:17.5px;margin:10px 0 8px}
   .step p{font-size:14px;color:var(--muted)}
 
-  /* ————— Témoignages ————— */
+  /* = Témoignages = */
   .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   @media(max-width:900px){.quotes{grid-template-columns:1fr}}
   .quote{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:26px;box-shadow:0 4px 14px rgba(27,42,33,.05);display:flex;flex-direction:column;gap:14px}
@@ -236,7 +236,7 @@
   .quote .who b{display:block;font-size:14px}
   .quote .who span{font-size:12.5px;color:var(--faint)}
 
-  /* ————— Carte île ————— */
+  /* = Carte île = */
   .map-sect{background:var(--white);border-top:1px solid var(--line)}
   .map-flex{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,70px);align-items:center}
   @media(max-width:860px){.map-flex{grid-template-columns:1fr}}
@@ -251,7 +251,7 @@
   .communes span{font-size:13px;font-weight:600;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:100px;padding:7px 14px}
   .communes span.all{background:var(--green);border-color:var(--green);color:#fff}
 
-  /* ————— CTA panneau ————— */
+  /* = CTA panneau = */
   .cta-band{background:var(--grad);border-radius:var(--r-lg);padding:clamp(36px,5vw,64px);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:30px;flex-wrap:wrap;position:relative;overflow:hidden;box-shadow:var(--shadow-lg)}
   .cta-band::before{content:"";position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.1);bottom:-140px;left:-80px}
   .cta-band h2{color:#fff;font-size:clamp(24px,3.2vw,36px);max-width:20ch}
@@ -259,15 +259,15 @@
   .cta-band .btn{background:#fff;color:var(--green-dark);box-shadow:0 10px 26px rgba(0,0,0,.18)}
   .cta-band .btn:hover{transform:translateY(-2px)}
 
-  /* ————— Pages internes : bannière ————— */
+  /* = Pages internes : bannière = */
   .pban{background:linear-gradient(180deg,var(--blue-pale),var(--bg));padding:clamp(40px,6vw,72px) 0 clamp(30px,4vw,48px)}
   .pban .crumb{font-size:13.5px;font-weight:600;color:var(--faint);margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .pban .crumb a{color:var(--blue-deep)}
   .pban .crumb a:hover{text-decoration:underline}
-  .pban h1{font-size:clamp(30px,4.4vw,48px)}
+  .pban h1,.pban .pt{font-size:clamp(30px,4.4vw,48px)}
   .pban p.lead{margin-top:14px;color:var(--muted);font-size:17.5px;max-width:62ch}
 
-  /* ————— Page service détail ————— */
+  /* = Page service détail = */
   .sd-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(28px,4vw,60px);align-items:start}
   @media(max-width:900px){.sd-grid{grid-template-columns:1fr}}
   .sd-photo{border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-lg);aspect-ratio:16/10}
@@ -288,7 +288,7 @@
   .other-serv a{font-size:13.5px;font-weight:600;background:var(--bg);border:1px solid var(--line);border-radius:100px;padding:8px 15px;transition:border-color .2s,color .2s}
   .other-serv a:hover{border-color:var(--green);color:var(--green-dark)}
 
-  /* ————— Engagements ————— */
+  /* = Engagements = */
   .cycle{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   @media(max-width:800px){.cycle{grid-template-columns:1fr}}
   .cyc{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:28px;text-align:center;position:relative}
@@ -307,7 +307,7 @@
   .ecolist b{display:block;font-size:15.5px}
   .ecolist p{font-size:14px;color:var(--muted)}
 
-  /* ————— À propos ————— */
+  /* = À propos = */
   .about-hero{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,4vw,64px);align-items:center}
   @media(max-width:860px){.about-hero{grid-template-columns:1fr}}
   .dir-card{background:var(--white);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:var(--r);padding:26px 28px;box-shadow:var(--shadow);margin-top:26px}
@@ -319,7 +319,7 @@
   .vals{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   @media(max-width:800px){.vals{grid-template-columns:1fr}}
 
-  /* ————— Devis multi-étapes ————— */
+  /* = Devis multi-étapes = */
   .devis-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(26px,4vw,56px);align-items:start}
   @media(max-width:900px){.devis-grid{grid-template-columns:1fr}}
   .wizard{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:clamp(24px,3.4vw,40px)}
@@ -368,7 +368,7 @@
   .side-re .tel-big b{font-family:var(--display);font-size:22px;color:var(--blue-deep);display:block}
   .side-re .tel-big span{font-size:13px;color:var(--muted)}
 
-  /* ————— Contact / FAQ ————— */
+  /* = Contact / FAQ = */
   .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,3.6vw,48px);align-items:start}
   @media(max-width:860px){.contact-grid{grid-template-columns:1fr}}
   .cc-card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:24px;display:flex;gap:16px;align-items:flex-start;box-shadow:0 4px 14px rgba(27,42,33,.05);transition:transform .25s}
@@ -395,12 +395,12 @@
   .wa-btn:hover{transform:translateY(-2px)}
   .wa-btn svg{width:19px;height:19px;fill:currentColor}
 
-  /* ————— Mentions ————— */
+  /* = Mentions = */
   .legal{max-width:760px}
   .legal h2{font-size:21px;margin:28px 0 10px}
   .legal p{color:var(--muted);font-size:15px;margin-bottom:10px}
 
-  /* ————— Intro « coup de raclette » ————— */
+  /* = Intro « coup de raclette » = */
   html.ld-lock{overflow:hidden}
   #loader{position:fixed;inset:0;max-height:1400px;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center}
   #loader.ld-out{animation:ldout .68s cubic-bezier(.7,0,.3,1) forwards}
@@ -435,7 +435,7 @@
   .ld-skip:hover{color:var(--ink);border-color:var(--line-2)}
   @media (prefers-reduced-motion:reduce){#loader{display:none}}
 
-  /* ————— Histoire du fondateur ————— */
+  /* = Histoire du fondateur = */
   .story{background:#122018;color:#EAF4EC;position:relative;overflow:hidden}
   .story::before{content:"";position:absolute;width:60vw;height:60vw;border-radius:50%;background:radial-gradient(circle,rgba(125,182,63,.14),transparent 65%);top:-25vw;right:-20vw;pointer-events:none}
   .story::after{content:"";position:absolute;width:44vw;height:44vw;border-radius:50%;background:radial-gradient(circle,rgba(14,138,194,.12),transparent 65%);bottom:-18vw;left:-14vw;pointer-events:none}
@@ -477,7 +477,7 @@
   .spk{position:absolute;width:11px;height:11px;pointer-events:none;z-index:5;background:linear-gradient(135deg,#fff,var(--green-soft));clip-path:polygon(50% 0,58% 42%,100% 50%,58% 58%,50% 100%,42% 58%,0 50%,42% 42%);animation:spkA .7s ease-out forwards}
   @keyframes spkA{0%{opacity:0;transform:scale(.3) rotate(0)}30%{opacity:1}100%{opacity:0;transform:scale(1.1) rotate(40deg) translateY(-14px)}}
 
-  /* ————— Prise de RDV ————— */
+  /* = Prise de RDV = */
   .rdv-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(26px,4vw,56px);align-items:start}
   @media(max-width:900px){.rdv-grid{grid-template-columns:1fr}}
   .rdv-card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:clamp(22px,3.2vw,36px)}
@@ -506,7 +506,7 @@
   .rdv-recap div{display:flex;justify-content:space-between;gap:14px;padding:5px 0}
   .rdv-recap span{color:var(--muted)}
 
-  /* ————— Espace admin ————— */
+  /* = Espace admin = */
   .pin-gate{max-width:420px;margin:0 auto;text-align:center;background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:clamp(28px,4vw,44px)}
   .pin-gate .lock{width:64px;height:64px;border-radius:50%;background:var(--blue-pale);color:var(--blue-deep);display:grid;place-items:center;margin:0 auto 18px}
   .pin-gate .lock svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -565,12 +565,12 @@
   .switch.on::after{left:23px}
   .admin-note{font-size:12.5px;color:var(--faint);margin-top:14px}
 
-  /* ————— Bouton thème ————— */
+  /* = Bouton thème = */
   .theme-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);color:var(--muted);background:var(--white);flex:none;cursor:pointer;transition:color .2s,border-color .2s,transform .3s}
   .theme-btn:hover{color:var(--green-dark);border-color:var(--green);transform:rotate(18deg)}
   .theme-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
-  /* ————— Espace client ————— */
+  /* = Espace client = */
   .cl-banner{background:linear-gradient(120deg,var(--green-pale),var(--blue-pale));border:1px solid var(--line-2);border-radius:var(--r);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}
   .cl-banner h2{font-size:21px}
   .cl-banner .who-site{font-size:13.5px;color:var(--muted)}
@@ -615,7 +615,7 @@
   .chat-in input{flex:1}
   .chat-in .btn{padding:12px 20px}
 
-  /* ————— Créateur de devis (admin) ————— */
+  /* = Créateur de devis (admin) = */
   .dv-line{display:grid;grid-template-columns:1fr 64px 84px 30px;gap:8px;margin-bottom:8px;align-items:center}
   .dv-line input{padding:10px 12px;font-size:13.5px}
   .dv-line .rm{width:28px;height:28px;border-radius:8px;background:var(--bg);border:1px solid var(--line);color:var(--faint);font-size:13px;cursor:pointer}
@@ -624,7 +624,7 @@
   .dv-tot div{display:flex;justify-content:space-between;padding:2px 0}
   .dv-tot .ttc{font-weight:700;font-size:15px;border-top:1px solid var(--line);margin-top:5px;padding-top:7px}
 
-  /* ————— Modal ————— */
+  /* = Modal = */
   .modal-veil[hidden]{display:none!important}
   .modal-veil{position:fixed;inset:0;z-index:150;background:rgba(10,18,12,.55);display:flex;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
   .modal{background:var(--white);border-radius:var(--r-lg);max-width:600px;width:100%;max-height:84vh;overflow-y:auto;padding:clamp(22px,3.4vw,36px);position:relative;box-shadow:var(--shadow-lg);animation:pageIn .35s cubic-bezier(.22,1,.36,1)}
@@ -635,7 +635,7 @@
   .dv-table td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
   .dv-table .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 
-  /* ————— Footer ————— */
+  /* = Footer = */
   footer.site{background:#15251C;color:#C9D8CC;margin-top:clamp(60px,8vw,100px)}
   .foot-top{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.2fr;gap:36px;padding:clamp(44px,5vw,64px) 0 36px}
   @media(max-width:900px){.foot-top{grid-template-columns:1fr 1fr}}
@@ -651,7 +651,7 @@
   .foot-bot{border-top:1px solid rgba(255,255,255,.1);padding:20px 0;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:12.5px;color:#8AA391}
   .foot-bot b{color:var(--green)}
 
-  /* ————— Barre mobile collante ————— */
+  /* = Barre mobile collante = */
   .mbar{position:fixed;bottom:0;left:0;right:0;z-index:70;display:none;grid-template-columns:1fr 1fr 1.2fr;background:var(--white);border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(27,42,33,.1)}
   .mbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 12px;font-size:11.5px;font-weight:700;color:var(--muted)}
   .mbar a svg{width:20px;height:20px}
