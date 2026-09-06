@@ -433,6 +433,18 @@
   @keyframes ldpop{0%{opacity:0;transform:scale(.2) translateY(8px)}45%{opacity:1}100%{opacity:0;transform:scale(1.25) translateY(-26px)}}
   .ld-skip{position:absolute;bottom:26px;right:30px;z-index:4;font-size:13px;font-weight:600;color:var(--faint);border-radius:100px;padding:8px 16px;border:1px solid var(--line);background:var(--white)}
   .ld-skip:hover{color:var(--ink);border-color:var(--line-2)}
+  #loader .ld-skip{z-index:6}
+  .ld-canvas{position:absolute;inset:0;z-index:3;width:100%;height:100%}
+  .ld-cloth{
+    position:absolute;z-index:4;width:132px;height:96px;top:-200px;left:-200px;
+    border-radius:20px 26px 22px 28px;will-change:transform;pointer-events:none;
+    background:linear-gradient(135deg,#F2F8EC 0 28%,#D5E8C4 28% 54%,#EDF5E2 54% 78%,#DDEDC4 78%);
+    box-shadow:0 12px 28px rgba(27,42,33,.3), inset 0 -7px 12px rgba(85,146,60,.22), inset 0 5px 9px rgba(255,255,255,.75);
+  }
+  .ld-cloth::before{content:"";position:absolute;inset:9px;border-radius:14px;background:repeating-linear-gradient(90deg,rgba(85,146,60,.13) 0 7px,transparent 7px 14px);opacity:.65}
+  .ld-cloth::after{content:"";position:absolute;left:12%;right:12%;top:46%;height:3px;border-radius:3px;background:rgba(63,122,46,.22)}
+  .ld-mode-lineaire .ld-canvas,.ld-mode-lineaire .ld-cloth{display:none}
+  .ld-mode-chiffon .ld-grime,.ld-mode-chiffon .ld-squeegee{display:none}
   @media (prefers-reduced-motion:reduce){#loader{display:none}}
 
   /* = Histoire du fondateur = */

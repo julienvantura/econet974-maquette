@@ -1030,7 +1030,8 @@
     });
   }
 
-  /* intro « coup de raclette » */
+  /* intro de nettoyage - INTRO_STYLE : "chiffon" (passes réalistes) ou "raclette-lineaire" (balayage d'origine, retour arrière garanti) */
+  var INTRO_STYLE = "chiffon";
   (function(){
     var ld = document.getElementById("loader");
     if (!ld) { startHero(); return; }
@@ -1049,17 +1050,148 @@
       b.style.animationDelay = (1.35 + Math.random()*.5) + "s";
       stage.appendChild(b);
     }
-    var doneCalled = false;
+    var doneCalled = false, raf = 0;
     function done(){
       if (doneCalled) return;
       doneCalled = true;
+      cancelAnimationFrame(raf);
       ld.classList.add("ld-out");
       document.documentElement.classList.remove("ld-lock");
       setTimeout(function(){ ld.classList.add("ld-gone"); }, 700);
       setTimeout(startHero, 250);
     }
     ld.querySelector(".ld-skip").addEventListener("click", done);
-    setTimeout(done, 2300);
+
+    var cv = document.getElementById("ldCanvas");
+    var cloth = document.getElementById("ldCloth");
+    if (INTRO_STYLE !== "chiffon" || !cv || !cloth || !cv.getContext) {
+      ld.classList.add("ld-mode-lineaire");
+      setTimeout(done, 2300);
+      return;
+    }
+    ld.classList.add("ld-mode-chiffon");
+
+    /* ----- moteur chiffon : la crasse est un canvas, le chiffon la gomme ----- */
+    var ctx = cv.getContext("2d");
+    var dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    var W = innerWidth, H = innerHeight;
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+
+    (function paintDirt(){
+      var w = cv.width, h = cv.height;
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = "rgba(226,224,214,0.94)";
+      ctx.fillRect(0, 0, w, h);
+      var g = ctx.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, "rgba(120,108,86,0.20)");
+      g.addColorStop(1, "rgba(94,84,64,0.34)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+      for (var i = 0; i < 420; i++) {
+        var x = Math.random() * w, y = Math.random() * h, r = (1 + Math.random() * 4) * dpr;
+        ctx.fillStyle = "rgba(70,60,44," + (0.04 + Math.random() * 0.10).toFixed(3) + ")";
+        ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill();
+      }
+      ctx.strokeStyle = "rgba(80,70,52,0.08)";
+      ctx.lineWidth = 6 * dpr;
+      for (var s = 0; s < 8; s++) {
+        var x0 = Math.random() * w, y0 = Math.random() * h;
+        ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0 + w * 0.2, y0 + h * 0.06); ctx.stroke();
+      }
+    })();
+
+    var BR_X = Math.max(110, W * 0.14) * dpr;
+    var BR_Y = Math.max(120, H * 0.20) * dpr;
+    function stamp(x, y){
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.translate(x * dpr, y * dpr);
+      ctx.scale(BR_X, BR_Y);
+      var g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+      g.addColorStop(0, "rgba(0,0,0,1)");
+      g.addColorStop(0.72, "rgba(0,0,0,0.95)");
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(0, 0, 1, 0, 6.283); ctx.fill();
+      ctx.restore();
+    }
+    function streak(x, y, ang){
+      ctx.save();
+      ctx.globalCompositeOperation = "source-over";
+      ctx.translate(x * dpr, y * dpr);
+      ctx.rotate(ang);
+      ctx.fillStyle = "rgba(96,86,66,0.055)";
+      ctx.fillRect(-70 * dpr, (Math.random() * 2 - 1) * 22 * dpr, 140 * dpr, 2.2 * dpr);
+      ctx.restore();
+    }
+
+    var strokes = [
+      { x0: -0.15 * W, y0: 0.12 * H, x1: 1.15 * W, y1: 0.24 * H, bow: -0.05 * H },
+      { x0: 1.15 * W,  y0: 0.46 * H, x1: -0.15 * W, y1: 0.58 * H, bow: 0.05 * H },
+      { x0: -0.15 * W, y0: 0.80 * H, x1: 1.15 * W, y1: 0.92 * H, bow: -0.04 * H }
+    ];
+    var T_START = 350, DUR = 330, LIFT = 70;
+    var t0 = null, lastP = null, lastStreak = 0, flying = false;
+
+    function qpoint(s, t){
+      var cx = (s.x0 + s.x1) / 2, cy = (s.y0 + s.y1) / 2 + s.bow;
+      var u = 1 - t;
+      return {
+        x: u * u * s.x0 + 2 * u * t * cx + t * t * s.x1,
+        y: u * u * s.y0 + 2 * u * t * cy + t * t * s.y1
+      };
+    }
+    function placeCloth(p, ang, lifted){
+      cloth.style.transform = "translate(" + (p.x - 66) + "px," + (p.y - 48) + "px) rotate(" + ang + "deg)" + (lifted ? " scale(1.08)" : "");
+    }
+    function frame(ts){
+      if (!t0) t0 = ts;
+      var e = ts - t0 - T_START;
+      if (e < 0) { raf = requestAnimationFrame(frame); return; }
+      var seg = DUR + LIFT;
+      var idx = Math.min(2, Math.floor(e / seg));
+      var local = e - idx * seg;
+      var s = strokes[idx];
+      if (local <= DUR) {
+        var t = Math.min(1, local / DUR);
+        t = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        var p = qpoint(s, t);
+        var ahead = qpoint(s, Math.min(1, t + 0.02));
+        var ang = Math.atan2(ahead.y - p.y, ahead.x - p.x);
+        placeCloth(p, ang * 57.3 * 0.25 + Math.sin(ts / 60) * 3, false);
+        if (lastP) {
+          var dx = p.x - lastP.x, dy = p.y - lastP.y;
+          var d = Math.sqrt(dx * dx + dy * dy), steps = Math.max(1, Math.ceil(d / 14));
+          for (var k = 1; k <= steps; k++) stamp(lastP.x + dx * k / steps, lastP.y + dy * k / steps);
+          lastStreak += d;
+          if (lastStreak > 46) { lastStreak = 0; streak(p.x, p.y, ang); }
+        } else {
+          stamp(p.x, p.y);
+        }
+        lastP = p;
+      } else {
+        lastP = null;
+        var nxt = strokes[Math.min(2, idx + 1)];
+        var lt = Math.min(1, (local - DUR) / LIFT);
+        placeCloth({ x: s.x1 + (nxt.x0 - s.x1) * lt, y: s.y1 + (nxt.y0 - s.y1) * lt }, 0, true);
+      }
+      if (e >= 3 * seg - LIFT) {
+        if (!flying) {
+          flying = true;
+          cloth.style.transition = "transform .3s cubic-bezier(.5,0,.8,.4), opacity .3s";
+          cloth.style.opacity = "0";
+          placeCloth({ x: W + 220, y: H + 180 }, 40, true);
+          cv.style.transition = "opacity .28s";
+          cv.style.opacity = "0";
+          setTimeout(done, 340);
+        }
+        return;
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+    setTimeout(done, 2600);
   })();
 
   /* ----- Guide de defilement ----- */
