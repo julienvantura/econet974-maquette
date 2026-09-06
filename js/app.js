@@ -1032,8 +1032,7 @@
     });
   }
 
-  /* intro de nettoyage - INTRO_STYLE : "chiffon" (passes réalistes) ou "raclette-lineaire" (balayage d'origine, retour arrière garanti) */
-  var INTRO_STYLE = "chiffon";
+  /* intro de nettoyage : passes de chiffon */
   (function(){
     var ld = document.getElementById("loader");
     if (!ld) { startHero(); return; }
@@ -1059,19 +1058,19 @@
       cancelAnimationFrame(raf);
       ld.classList.add("ld-out");
       document.documentElement.classList.remove("ld-lock");
-      setTimeout(function(){ ld.classList.add("ld-gone"); }, 700);
+      setTimeout(function(){ ld.classList.add("ld-gone"); dispatchEvent(new Event("introdone")); }, 700);
       setTimeout(startHero, 250);
     }
     ld.querySelector(".ld-skip").addEventListener("click", done);
 
     var cv = document.getElementById("ldCanvas");
     var cloth = document.getElementById("ldCloth");
-    if (INTRO_STYLE !== "chiffon" || !cv || !cloth || !cv.getContext) {
-      ld.classList.add("ld-mode-lineaire");
-      setTimeout(done, 2300);
+    if (!cv || !cloth || !cv.getContext) {
+      ld.remove();
+      document.documentElement.classList.remove("ld-lock");
+      setTimeout(startHero, 60);
       return;
     }
-    ld.classList.add("ld-mode-chiffon");
 
     /* ----- moteur chiffon : la crasse est un canvas, le chiffon la gomme ----- */
     var ctx = cv.getContext("2d");
@@ -1229,8 +1228,9 @@
     addEventListener("scroll", update, { passive: true });
     addEventListener("resize", update, { passive: true });
     addEventListener("hashchange", function(){ setTimeout(update, 150); });
+    addEventListener("introdone", function(){ setTimeout(update, 200); });
     setTimeout(update, 500);
-    setTimeout(update, 3200);
+    setTimeout(update, 4500);
   })();
 
   /* ----- Init ----- */
