@@ -1185,14 +1185,14 @@
           placeCloth({ x: W + 220, y: H + 180 }, 40, true);
           cv.style.transition = "opacity .28s";
           cv.style.opacity = "0";
-          setTimeout(done, 340);
+          setTimeout(done, 1340);
         }
         return;
       }
       raf = requestAnimationFrame(frame);
     }
     raf = requestAnimationFrame(frame);
-    setTimeout(done, 3600);
+    setTimeout(done, 4700);
   })();
 
   /* ----- Guide de defilement ----- */
