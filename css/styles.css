@@ -617,6 +617,17 @@
   .dv-tot .ttc{font-weight:700;font-size:15px;border-top:1px solid var(--line);margin-top:5px;padding-top:7px}
 
   /* = Modal = */
+  /* fiche client (espace pro) */
+  .fiche-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  @media(max-width:1000px){.fiche-grid{grid-template-columns:1fr}}
+  .cl-gal.mini{grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+  .cl-gal.mini figure{aspect-ratio:4/3}
+  .cl-gal.mini figcaption{font-size:9.5px;padding:14px 6px 5px}
+  .ph-del{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:rgba(10,18,12,.68);color:#fff;font-size:11px;cursor:pointer;border:none;line-height:1}
+  .ph-del:hover{background:#C0392B}
+  .fc-add{display:flex;gap:8px;align-items:center;margin-top:10px}
+  .fc-add input{padding:10px 12px;font-size:13.5px}
+
   .modal-veil[hidden]{display:none!important}
   .modal-veil{position:fixed;inset:0;z-index:150;background:rgba(10,18,12,.55);display:flex;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
   .modal{background:var(--white);border-radius:var(--r-lg);max-width:600px;width:100%;max-height:84vh;overflow-y:auto;padding:clamp(22px,3.4vw,36px);position:relative;box-shadow:var(--shadow-lg);animation:pageIn .35s cubic-bezier(.22,1,.36,1)}

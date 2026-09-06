@@ -436,6 +436,7 @@
         lab.classList.toggle("on", on);
       }
     });
+    renderFiche();
   }
   function pinTry(){
     if (document.getElementById("pin-input").value === "9744") {
@@ -647,7 +648,7 @@
         (f.statut === "due" ? "<span class='doc-act' data-pay='" + f.id + "'>Payer en ligne</span>" : "") + "</div>";
     }).join("");
     document.getElementById("cl-photos").innerHTML = p.photos.map(function(ph){
-      return "<figure><img loading='lazy' src='" + IMGS[ph[0]] + "' alt='" + ph[1] + "'><figcaption>" + ph[1] + "</figcaption></figure>";
+      return "<figure><img loading='lazy' src='" + phSrc(ph) + "' alt='" + ph[1] + "'><figcaption>" + ph[1] + "</figcaption></figure>";
     }).join("");
     var chat = document.getElementById("cl-chat");
     chat.innerHTML = p.messages.map(function(m){
@@ -679,11 +680,6 @@
     p.messages.push({ from: "client", txt: txt, at: "À l'instant" });
     inp.value = "";
     ptWrite(p);
-    setTimeout(function(){
-      var p2 = ptRead();
-      p2.messages.push({ from: "econet", txt: "Bien reçu ! L'équipe vous répond très vite. (réponse automatique - démo)", at: "À l'instant" });
-      ptWrite(p2);
-    }, 1400);
   });
 
   /* créateur de devis (admin) */
@@ -742,6 +738,98 @@
       notify("Devis envoyé - visible immédiatement dans l'espace client ✅");
     });
     renderDevisAdmin();
+  }
+
+  /* ----- Fiche client (espace pro) : photos, factures, messagerie ----- */
+  function phSrc(ph){ return ph[0] && ph[0].indexOf("data:") === 0 ? ph[0] : IMGS[ph[0]]; }
+  function renderFiche(){
+    var box = document.getElementById("fc-photos");
+    if (!box) return;
+    var p = ptRead();
+    document.getElementById("fc-name").textContent = p.client.name;
+    box.innerHTML = p.photos.map(function(ph, i){
+      return "<figure><img loading='lazy' src='" + phSrc(ph) + "' alt=''><figcaption>" + ph[1] + "</figcaption><button class='ph-del' data-delphoto='" + i + "' aria-label='Retirer la photo'>✕</button></figure>";
+    }).join("") || "<p class='admin-note'>Aucune photo pour l'instant.</p>";
+    document.getElementById("fc-fact").innerHTML = p.factures.map(function(f, i){
+      return "<div class='doc-row'><span class='dr-t'><b>" + f.titre + "</b><span>" + f.id + "</span></span>" +
+        "<span class='dr-m'>" + eur(f.montant) + "</span>" +
+        "<span class='st-chip " + (f.statut === "payee" ? "ok'>Payée" : "due'>Échéance " + fmtD2(f.echeance)) + "</span>" +
+        (f.statut === "due" ? "<span class='doc-act' data-payer='" + i + "'>Marquer payée</span>" : "") + "</div>";
+    }).join("");
+    var chat = document.getElementById("fc-chat");
+    chat.innerHTML = p.messages.map(function(m){
+      return "<div class='msg " + (m.from === "econet" ? "client" : "econet") + "'>" + m.txt +
+        "<small>" + (m.from === "econet" ? "Vous (EcoNet) · " : p.client.contact + " · ") + m.at + "</small></div>";
+    }).join("");
+    chat.scrollTop = chat.scrollHeight;
+  }
+  var fcFile = document.getElementById("fc-photo-file");
+  if (fcFile) {
+    fcFile.addEventListener("change", function(){
+      var f = fcFile.files && fcFile.files[0];
+      if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function(){
+        var img = new Image();
+        img.onload = function(){
+          var MAX = 800;
+          var k = Math.min(1, MAX / Math.max(img.width, img.height));
+          var c = document.createElement("canvas");
+          c.width = Math.round(img.width * k);
+          c.height = Math.round(img.height * k);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          var url = c.toDataURL("image/jpeg", 0.72);
+          var cap = (document.getElementById("fc-photo-cap").value || "").trim() || ("Photo du " + fmtD2(isoD(new Date())));
+          var p = ptRead();
+          p.photos.push([url, cap]);
+          try { ptWrite(p); notify("Photo ajoutée - visible dans l'espace client 📷"); }
+          catch(e){ notify("Stockage local plein : supprimez une photo avant d'en ajouter (limite de la démo)."); }
+          document.getElementById("fc-photo-cap").value = "";
+          fcFile.value = "";
+        };
+        img.src = rd.result;
+      };
+      rd.readAsDataURL(f);
+    });
+    document.getElementById("fc-send").addEventListener("click", function(){
+      var inp = document.getElementById("fc-msg");
+      var txt = inp.value.trim();
+      if (!txt) return;
+      var p = ptRead();
+      p.messages.push({ from: "econet", txt: txt, at: "À l'instant" });
+      inp.value = "";
+      ptWrite(p);
+      notify("Réponse envoyée au client ✅");
+    });
+    document.getElementById("fc-msg").addEventListener("keydown", function(e){
+      if (e.key === "Enter") document.getElementById("fc-send").click();
+    });
+    document.getElementById("fc-fact-add").addEventListener("click", function(){
+      var titre = document.getElementById("fc-f-titre").value.trim();
+      var montant = parseFloat(String(document.getElementById("fc-f-montant").value).replace(",", "."));
+      if (!titre || !(montant > 0)) { notify("Indiquez l'objet et le montant de la facture."); return; }
+      var p = ptRead();
+      var ech = new Date(); ech.setDate(ech.getDate() + 30);
+      p.factures.push({ id: "FAC-2026-" + (140 + p.factures.length), titre: titre, montant: montant, statut: "due", echeance: isoD(ech) });
+      ptWrite(p);
+      document.getElementById("fc-f-titre").value = "";
+      document.getElementById("fc-f-montant").value = "";
+      notify("Facture émise - visible dans l'espace client, avec rappel d'échéance ✅");
+    });
+    document.getElementById("admin-app").addEventListener("click", function(e){
+      var el;
+      if ((el = e.target.closest("[data-delphoto]"))) {
+        var p = ptRead();
+        p.photos.splice(+el.dataset.delphoto, 1);
+        ptWrite(p);
+        notify("Photo retirée de l'espace client");
+      } else if ((el = e.target.closest("[data-payer]"))) {
+        var p2 = ptRead();
+        p2.factures[+el.dataset.payer].statut = "payee";
+        ptWrite(p2);
+        notify("Facture marquée payée ✅");
+      }
+    });
   }
 
   /* ----- PDF du devis (jsPDF + capability downloads) ----- */
@@ -944,8 +1032,14 @@
   /* sync live du portail entre onglets */
   addEventListener("storage", function(e){
     if (e.key !== PT_KEY || !e.newValue) return;
+    var beforeMsg = ptMem ? ptMem.messages.length : 0;
     try { ptMem = JSON.parse(e.newValue); } catch(err){ return; }
-    renderClient(); renderDevisAdmin();
+    var adminOn2 = document.querySelector('[data-page="admin"]').classList.contains("on");
+    if (adminOn2 && ptMem.messages.length > beforeMsg) {
+      var lm = ptMem.messages[ptMem.messages.length - 1];
+      if (lm.from === "client") notify("💬 Nouveau message client : « " + lm.txt.slice(0, 60) + (lm.txt.length > 60 ? "…" : "") + " »");
+    }
+    renderClient(); renderDevisAdmin(); renderFiche();
   });
 
   /* ═════════ Effet waouh : GSAP + intro raclette ═════════ */
