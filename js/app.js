@@ -856,6 +856,41 @@
     rd.readAsDataURL(f);
   });
 
+  /* ----- création d'un nouveau client ----- */
+  function slugify(name){
+    var base = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "client";
+    var id = base, n = 2;
+    while (ptClientById(id)) { id = base + "-" + n; n++; }
+    return id;
+  }
+  document.getElementById("nc-open").addEventListener("click", function(){
+    var f = document.getElementById("nc-form");
+    f.hidden = !f.hidden;
+    if (!f.hidden) document.getElementById("nc-nom").focus();
+  });
+  document.getElementById("nc-cancel").addEventListener("click", function(){
+    document.getElementById("nc-form").hidden = true;
+  });
+  document.getElementById("nc-create").addEventListener("click", function(){
+    var nom = document.getElementById("nc-nom").value.trim();
+    if (!nom) { notify("Indiquez au moins le nom de la structure."); return; }
+    var c = {
+      id: slugify(nom),
+      name: nom,
+      contact: document.getElementById("nc-contact").value.trim() || "Contact à renseigner",
+      site: document.getElementById("nc-site").value.trim() || "La Réunion",
+      devis: [], factures: [], planning: [], photos: [], messages: []
+    };
+    ptRead().clients.push(c);
+    FICHE_ID = c.id;
+    ptWrite(ptRead());
+    document.getElementById("nc-form").hidden = true;
+    document.getElementById("nc-nom").value = "";
+    document.getElementById("nc-contact").value = "";
+    document.getElementById("nc-site").value = "";
+    notify("Client créé - sa fiche est prête : ajoutez un devis, des photos ou une facture ✅");
+  });
+
   /* ----- vue Devis : créateur multi-clients + liste globale ----- */
   function dvLineHTML(des, q, pu){
     return "<div class='dv-line'><input class='dv-des' placeholder='Désignation' value=\"" + (des || "") + "\">" +

@@ -830,7 +830,21 @@
 
         <div class="aview" data-view="clients" hidden>
           <div class="abox" id="cl-listwrap">
-            <h3>Portefeuille clients</h3>
+            <h3 style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">Portefeuille clients
+              <button class="btn btn-p" id="nc-open" style="padding:9px 18px;font-size:13.5px">➕ Nouveau client</button>
+            </h3>
+            <div id="nc-form" hidden style="background:var(--bg);border:1px dashed var(--line-2);border-radius:14px;padding:16px;margin-bottom:14px">
+              <div class="frow">
+                <div class="fgroup"><label for="nc-nom">Nom de la structure *</label><input id="nc-nom" placeholder="Ex. : Pharmacie du Lagon"></div>
+                <div class="fgroup"><label for="nc-contact">Contact</label><input id="nc-contact" placeholder="Ex. : Mme Hoarau (gérante)"></div>
+              </div>
+              <div class="fgroup"><label for="nc-site">Adresse / commune / type de contrat</label><input id="nc-site" placeholder="Ex. : Saint-Leu · entretien 1×/sem."></div>
+              <div style="display:flex;gap:10px">
+                <button class="btn btn-p" id="nc-create" style="padding:11px 22px;font-size:14px">Créer la fiche</button>
+                <button class="btn btn-o" id="nc-cancel" style="padding:11px 22px;font-size:14px">Annuler</button>
+              </div>
+              <p class="admin-note">Ses identifiants d'espace client seront générés à la mise en production.</p>
+            </div>
             <div id="cl-list"></div>
             <p class="admin-note">Cliquez sur un client pour ouvrir sa fiche : photos du chantier, factures et messagerie.</p>
           </div>
