@@ -1062,6 +1062,43 @@
     setTimeout(done, 2300);
   })();
 
+  /* ----- Guide de defilement ----- */
+  (function(){
+    var sd = document.getElementById("scrollDown");
+    if (!sd) return;
+    function headerOffset(){
+      var hd = document.querySelector("header.site");
+      return (hd ? hd.offsetHeight : 0) + 14;
+    }
+    function nextTarget(){
+      var pg = document.querySelector(".page.on");
+      if (!pg) return null;
+      var y = scrollY + headerOffset() + 12;
+      var kids = pg.children;
+      for (var i = 0; i < kids.length; i++) {
+        var top = kids[i].getBoundingClientRect().top + scrollY;
+        if (top > y + 40 && kids[i].offsetHeight > 60) return kids[i];
+      }
+      return null;
+    }
+    function update(){
+      var nearBottom = scrollY + innerHeight >= document.body.scrollHeight - 160;
+      var ld = document.getElementById("loader");
+      var intro = ld && !ld.classList.contains("ld-gone") && ld.parentNode;
+      sd.classList.toggle("off", !nextTarget() || nearBottom || !!intro);
+    }
+    sd.addEventListener("click", function(){
+      var t = nextTarget();
+      if (t) scrollTo({ top: t.getBoundingClientRect().top + scrollY - headerOffset() + 6, behavior: "smooth" });
+      setTimeout(update, 600);
+    });
+    addEventListener("scroll", update, { passive: true });
+    addEventListener("resize", update, { passive: true });
+    addEventListener("hashchange", function(){ setTimeout(update, 150); });
+    setTimeout(update, 500);
+    setTimeout(update, 3200);
+  })();
+
   /* ----- Init ----- */
   route();
 })();

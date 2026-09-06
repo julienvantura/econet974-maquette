@@ -635,6 +635,15 @@
   .dv-table td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
   .dv-table .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 
+  /* = Guide de defilement = */
+  .scroll-down{position:fixed;left:50%;bottom:26px;z-index:60;width:46px;height:46px;border-radius:50%;background:var(--white);border:1px solid var(--line-2);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--green-dark);cursor:pointer;transition:opacity .35s,transform .35s,border-color .2s;transform:translateX(-50%)}
+  .scroll-down svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;animation:sdBounce 1.7s ease-in-out infinite}
+  @keyframes sdBounce{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
+  .scroll-down:hover{border-color:var(--green);transform:translateX(-50%) translateY(-2px)}
+  .scroll-down.off{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(12px)}
+  @media(max-width:760px){.scroll-down{bottom:82px;width:42px;height:42px}}
+  @media (prefers-reduced-motion:reduce){.scroll-down svg{animation:none}}
+
   /* = Footer = */
   footer.site{background:#15251C;color:#C9D8CC;margin-top:clamp(60px,8vw,100px)}
   .foot-top{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.2fr;gap:36px;padding:clamp(44px,5vw,64px) 0 36px}
