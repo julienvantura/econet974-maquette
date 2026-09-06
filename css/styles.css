@@ -628,6 +628,26 @@
   .fc-add{display:flex;gap:8px;align-items:center;margin-top:10px}
   .fc-add input{padding:10px 12px;font-size:13.5px}
 
+  /* back-office à onglets */
+  .av-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:var(--shadow)}
+  .av-tab{padding:10px 16px;border-radius:11px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;display:inline-flex;gap:8px;align-items:center;border:none;background:none}
+  .av-tab:hover{color:var(--ink);background:var(--bg)}
+  .av-tab.on{background:var(--green-pale);color:var(--green-dark)}
+  .av-tab .cnt{font-size:11px;background:var(--blue-pale);color:var(--blue-deep);border-radius:100px;padding:2px 9px}
+  .aview[hidden]{display:none!important}
+  .aview>.abox{margin-top:0}
+  .aview .astats{margin-bottom:18px}
+  .client-row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px 12px;border:none;border-bottom:1px solid var(--line);background:none;cursor:pointer;border-radius:10px;font:inherit;color:inherit}
+  .client-row:hover{background:var(--bg)}
+  .client-row:last-of-type{border-bottom:none}
+  .client-row .av{width:42px;height:42px;border-radius:50%;background:var(--grad);color:#fff;font-family:var(--display);font-weight:600;display:grid;place-items:center;flex:none;font-size:14px}
+  .client-row .cr-t{flex:1;min-width:0}
+  .client-row .cr-t b{display:block;font-size:15px}
+  .client-row .cr-t span{font-size:12.5px;color:var(--muted)}
+  .client-row .cr-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .client-row .cr-go{color:var(--faint);font-size:20px}
+  @media(max-width:700px){.client-row .cr-badges{display:none}}
+
   .modal-veil[hidden]{display:none!important}
   .modal-veil{position:fixed;inset:0;z-index:150;background:rgba(10,18,12,.55);display:flex;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
   .modal{background:var(--white);border-radius:var(--r-lg);max-width:600px;width:100%;max-height:84vh;overflow-y:auto;padding:clamp(22px,3.4vw,36px);position:relative;box-shadow:var(--shadow-lg);animation:pageIn .35s cubic-bezier(.22,1,.36,1)}

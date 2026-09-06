@@ -797,14 +797,111 @@
       </div>
 
       <div id="admin-app" style="display:none">
-        <div class="astats" id="a-stats"></div>
-        <div class="admin-grid">
-          <div>
-            <div class="abox rv">
-              <h3>Demandes à traiter <span class="cnt" id="a-pending-count">0</span></h3>
-              <div id="a-pending"></div>
+        <nav class="av-nav" aria-label="Navigation de l'espace pro">
+          <button class="av-tab on" data-av="dash">📊 Tableau de bord</button>
+          <button class="av-tab" data-av="planning">📅 Planning</button>
+          <button class="av-tab" data-av="clients">👥 Clients <span class="cnt" id="cl-count">0</span></button>
+          <button class="av-tab" data-av="devis">🧾 Devis</button>
+          <button class="av-tab" data-av="reglages">⚙️ Réglages</button>
+        </nav>
+
+        <div class="aview" data-view="dash">
+          <div class="astats" id="a-stats"></div>
+          <div class="abox">
+            <h3>Demandes de rendez-vous à traiter <span class="cnt" id="a-pending-count">0</span></h3>
+            <div id="a-pending"></div>
+          </div>
+        </div>
+
+        <div class="aview" data-view="planning" hidden>
+          <div class="abox">
+            <div class="plan-head">
+              <h3 style="margin:0">Planning des visites</h3>
+              <div class="plan-nav">
+                <button id="a-prev" aria-label="Semaine précédente">‹</button>
+                <span class="wlbl" id="a-wlbl"></span>
+                <button id="a-next" aria-label="Semaine suivante">›</button>
+              </div>
             </div>
-            <div class="abox rv" style="margin-top:18px">
+            <div style="overflow-x:auto"><div class="plan" id="a-plan" style="min-width:540px"></div></div>
+            <p class="admin-note"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--green-pale);border:1px solid var(--green-soft)"></span> Confirmé &nbsp; <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#FBF3E0;border:1px solid #EAD9AC"></span> En attente &nbsp; <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#FDECEC;border:1px solid #C0392B"></span> Conflit à résoudre</p>
+          </div>
+        </div>
+
+        <div class="aview" data-view="clients" hidden>
+          <div class="abox" id="cl-listwrap">
+            <h3>Portefeuille clients</h3>
+            <div id="cl-list"></div>
+            <p class="admin-note">Cliquez sur un client pour ouvrir sa fiche : photos du chantier, factures et messagerie.</p>
+          </div>
+          <div class="abox" id="fc-detail" hidden>
+            <button class="doc-act" id="fc-back" style="background:none;border:none;padding:0;margin-bottom:14px;font-size:14px">‹ Retour au portefeuille</button>
+            <h3>Fiche client - <span id="fc-name">…</span> <span class="cnt">liée en direct à son espace client</span></h3>
+            <div class="fiche-grid">
+              <div>
+                <label>Photos du chantier</label>
+                <div class="cl-gal mini" id="fc-photos"></div>
+                <div class="fc-add">
+                  <input id="fc-photo-cap" placeholder="Légende (ex. : Hall A - après)">
+                  <label class="btn btn-o" for="fc-photo-file" style="padding:10px 16px;font-size:13.5px;cursor:pointer;white-space:nowrap">📷 Ajouter</label>
+                  <input type="file" id="fc-photo-file" accept="image/*" hidden>
+                </div>
+                <p class="admin-note">La photo est redimensionnée puis apparaît immédiatement dans l'espace client.</p>
+              </div>
+              <div>
+                <label>Factures</label>
+                <div id="fc-fact"></div>
+                <div class="fc-add">
+                  <input id="fc-f-titre" placeholder="Objet (ex. : Entretien octobre)">
+                  <input id="fc-f-montant" type="number" step="0.01" min="0" placeholder="€ TTC" style="max-width:100px">
+                  <button class="btn btn-b" id="fc-fact-add" style="padding:10px 16px;font-size:13.5px;white-space:nowrap">Émettre</button>
+                </div>
+                <p class="admin-note">Échéance par défaut : 30 jours. Le rappel s'affiche automatiquement côté client.</p>
+              </div>
+              <div>
+                <label>Messagerie client</label>
+                <div class="chat" id="fc-chat" style="max-height:220px"></div>
+                <div class="chat-in">
+                  <input id="fc-msg" placeholder="Répondre au client…" aria-label="Votre réponse">
+                  <button class="btn btn-b" id="fc-send">Envoyer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="aview" data-view="devis" hidden>
+          <div class="admin-grid" style="grid-template-columns:.9fr 1.1fr">
+            <div class="abox">
+              <h3>Créer un devis</h3>
+              <div class="fgroup">
+                <label for="dv-client">Client</label>
+                <select id="dv-client"></select>
+              </div>
+              <div class="fgroup">
+                <label for="dv-titre">Objet du devis</label>
+                <input id="dv-titre" placeholder="Ex. : Remise en état parking souterrain">
+              </div>
+              <label style="margin-bottom:8px">Lignes de prestation</label>
+              <div class="dv-line" style="margin-bottom:4px;font-size:10.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.05em">
+                <span>Désignation</span><span>Qté</span><span>PU HT</span><span></span>
+              </div>
+              <div id="dv-lines"></div>
+              <button class="doc-act" id="dv-add" style="background:none;border:none;padding:4px 0">+ Ajouter une ligne</button>
+              <div class="dv-tot" id="dv-tot"></div>
+              <button class="btn btn-p" id="dv-send" style="width:100%">Envoyer le devis au client</button>
+              <p class="admin-note">Le devis apparaît instantanément dans l'espace du client sélectionné.</p>
+            </div>
+            <div class="abox">
+              <h3>Tous les devis</h3>
+              <div id="dv-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="aview" data-view="reglages" hidden>
+          <div class="admin-grid">
+            <div class="abox">
               <h3>Synchronisation agenda</h3>
               <div class="sync-row">
                 <span class="s-name"><span class="s-ic" style="background:#4285F4">G</span><span>Google Agenda<span class="s-state" data-sync-state="g">Non connecté</span></span></span>
@@ -820,89 +917,19 @@
               </div>
               <p class="admin-note">Quel que soit l'agenda que vous utilisez déjà, vos RDV s'y retrouvent automatiquement - dans les deux sens. <b>Connexion réelle à la mise en ligne.</b></p>
             </div>
-            <div class="abox rv" style="margin-top:18px">
-              <h3>Application &amp; notifications</h3>
-              <div class="sync-row">
-                <span class="s-name"><span class="s-ic" style="background:var(--green)">📱</span><span>Installée sur l'écran d'accueil<span class="s-state on">Application (PWA) - démo</span></span></span>
-              </div>
-              <div class="sync-row">
-                <span class="s-name"><span class="s-ic" style="background:var(--blue)">🔔</span><span>Notifications push<span class="s-state" data-sync-state="n">Désactivées</span></span></span>
-                <button class="switch" data-sync="n" aria-label="Activer les notifications"></button>
-              </div>
-              <p class="admin-note">Chaque nouvelle réservation vous alerte en direct sur votre téléphone - essayez : ouvrez la page « Rendez-vous » dans un autre onglet et réservez un créneau.</p>
-            </div>
-            <div class="abox rv" style="margin-top:18px">
-              <h3>Créer un devis</h3>
-              <div class="fgroup">
-                <label for="dv-client">Client</label>
-                <select id="dv-client">
-                  <option>Résidence Les Alizés (espace client actif)</option>
-                  <option>Cabinet dentaire Grondin</option>
-                  <option>Mairie annexe - Le Port</option>
-                  <option>SARL Horizon Bureaux</option>
-                </select>
-              </div>
-              <div class="fgroup">
-                <label for="dv-titre">Objet du devis</label>
-                <input id="dv-titre" placeholder="Ex. : Remise en état parking souterrain">
-              </div>
-              <label style="margin-bottom:8px">Lignes de prestation</label>
-              <div class="dv-line" style="margin-bottom:4px;font-size:10.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.05em">
-                <span>Désignation</span><span>Qté</span><span>PU HT</span><span></span>
-              </div>
-              <div id="dv-lines"></div>
-              <button class="doc-act" id="dv-add" style="background:none;border:none;padding:4px 0">+ Ajouter une ligne</button>
-              <div class="dv-tot" id="dv-tot"></div>
-              <button class="btn btn-p" id="dv-send" style="width:100%">Envoyer le devis au client</button>
-              <p class="admin-note">Le devis apparaît instantanément dans l'espace client, avec notification par e-mail (démo).</p>
-              <div id="dv-list" style="margin-top:14px"></div>
-            </div>
-            <button class="btn btn-o" id="a-reset" style="width:100%;margin-top:18px;font-size:14px">Réinitialiser la démo</button>
-          </div>
-          <div class="abox rv" style="--d:.08s">
-            <div class="plan-head">
-              <h3 style="margin:0">Planning des visites</h3>
-              <div class="plan-nav">
-                <button id="a-prev" aria-label="Semaine précédente">‹</button>
-                <span class="wlbl" id="a-wlbl"></span>
-                <button id="a-next" aria-label="Semaine suivante">›</button>
-              </div>
-            </div>
-            <div style="overflow-x:auto"><div class="plan" id="a-plan" style="min-width:540px"></div></div>
-            <p class="admin-note"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--green-pale);border:1px solid var(--green-soft)"></span> Confirmé &nbsp; <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#FBF3E0;border:1px solid #EAD9AC"></span> En attente &nbsp; <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#FDECEC;border:1px solid #C0392B"></span> Conflit à résoudre</p>
-          </div>
-        </div>
-
-        <div class="abox rv" style="margin-top:18px">
-          <h3>Fiche client - <span id="fc-name">…</span> <span class="cnt">liée en direct à l'espace client</span></h3>
-          <div class="fiche-grid">
             <div>
-              <label>Photos du chantier</label>
-              <div class="cl-gal mini" id="fc-photos"></div>
-              <div class="fc-add">
-                <input id="fc-photo-cap" placeholder="Légende (ex. : Hall A - après)">
-                <label class="btn btn-o" for="fc-photo-file" style="padding:10px 16px;font-size:13.5px;cursor:pointer;white-space:nowrap">📷 Ajouter</label>
-                <input type="file" id="fc-photo-file" accept="image/*" hidden>
+              <div class="abox">
+                <h3>Application &amp; notifications</h3>
+                <div class="sync-row">
+                  <span class="s-name"><span class="s-ic" style="background:var(--green)">📱</span><span>Installée sur l'écran d'accueil<span class="s-state on">Application (PWA) - démo</span></span></span>
+                </div>
+                <div class="sync-row">
+                  <span class="s-name"><span class="s-ic" style="background:var(--blue)">🔔</span><span>Notifications push<span class="s-state" data-sync-state="n">Désactivées</span></span></span>
+                  <button class="switch" data-sync="n" aria-label="Activer les notifications"></button>
+                </div>
+                <p class="admin-note">Chaque nouvelle réservation ou message client vous alerte en direct - essayez depuis un autre onglet.</p>
               </div>
-              <p class="admin-note">La photo est redimensionnée puis apparaît immédiatement dans l'espace client.</p>
-            </div>
-            <div>
-              <label>Factures</label>
-              <div id="fc-fact"></div>
-              <div class="fc-add">
-                <input id="fc-f-titre" placeholder="Objet (ex. : Entretien octobre)">
-                <input id="fc-f-montant" type="number" step="0.01" min="0" placeholder="€ TTC" style="max-width:100px">
-                <button class="btn btn-b" id="fc-fact-add" style="padding:10px 16px;font-size:13.5px;white-space:nowrap">Émettre</button>
-              </div>
-              <p class="admin-note">Échéance par défaut : 30 jours. Le rappel s'affiche automatiquement côté client.</p>
-            </div>
-            <div>
-              <label>Messagerie client</label>
-              <div class="chat" id="fc-chat" style="max-height:220px"></div>
-              <div class="chat-in">
-                <input id="fc-msg" placeholder="Répondre au client…" aria-label="Votre réponse">
-                <button class="btn btn-b" id="fc-send">Envoyer</button>
-              </div>
+              <button class="btn btn-o" id="a-reset" style="width:100%;margin-top:18px;font-size:14px">Réinitialiser la démo</button>
             </div>
           </div>
         </div>

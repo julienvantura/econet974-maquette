@@ -436,7 +436,9 @@
         lab.classList.toggle("on", on);
       }
     });
-    renderFiche();
+    renderClients();
+    renderDevisAdmin();
+    applyView();
   }
   function pinTry(){
     if (document.getElementById("pin-input").value === "9744") {
@@ -524,36 +526,65 @@
     });
   })();
 
-  /* ═════════ Portail client + devis ═════════ */
-  var PT_KEY = "econet_portal_v1";
+  /* ═════════ Portail multi-clients + back-office à vues ═════════ */
+  var PT_KEY = "econet_portal_v2";
   function eur(n){ return n.toFixed(2).replace(".", ",") + " €"; }
+  function fmtD2(iso){ var p = iso.split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
+  function initiales(name){
+    return name.replace(/[-·]/g, " ").split(/\s+/).filter(function(w){ return w.length > 2 || /^[A-Z0-9]/.test(w); })
+      .slice(0, 2).map(function(w){ return w[0]; }).join("").toUpperCase();
+  }
   function portalSeed(){
     var today = new Date();
     function dOff(off){ var x = new Date(today); x.setDate(x.getDate() + off); return isoD(x); }
-    return {
-      client: { name: "Résidence Les Alizés", contact: "M. Lebreton (syndic)", site: "12 rue des Filaos, Saint-Denis · contrat annuel" },
-      devis: [
-        { id: "DEV-2026-041", titre: "Entretien des parties communes - contrat annuel", date: dOff(-24), statut: "accepte",
-          lignes: [["Entretien hebdomadaire hall, escaliers, ascenseur (46 sem.)", 46, 120], ["Vitrerie trimestrielle", 4, 180], ["Sortie et nettoyage des bacs (hebdo)", 46, 25]] },
-        { id: "DEV-2026-052", titre: "Remise en état du parking souterrain", date: dOff(-6), statut: "attente",
-          lignes: [["Décapage mécanique des sols (680 m²)", 1, 890], ["Évacuation des encombrants + tri", 1, 240]] }
-      ],
-      factures: [
-        { id: "FAC-2026-118", titre: "Entretien - août 2026", montant: 612.40, statut: "payee", date: dOff(-32) },
-        { id: "FAC-2026-131", titre: "Entretien - septembre 2026", montant: 612.40, statut: "due", echeance: dOff(9) }
-      ],
-      planning: [
-        { d: dOff(1), t: "06:00", dur: "2 h", titre: "Entretien hebdomadaire - hall A & escaliers", rec: "Hebdomadaire" },
-        { d: dOff(4), t: "09:00", dur: "3 h", titre: "Vitrerie - façade & entrée", rec: "Trimestriel" },
-        { d: dOff(8), t: "06:00", dur: "2 h", titre: "Entretien hebdomadaire - hall A & escaliers", rec: "Hebdomadaire" }
-      ],
-      photos: [["copro", "Hall A - après remise en état"], ["chantier", "Parking - décapage en cours"], ["mops", "Entretien hebdomadaire en cours"], ["tri", "Local poubelles - tri sélectif installé"]],
-      messages: [
-        { from: "econet", txt: "Bonjour M. Lebreton ! L'intervention vitrerie est confirmée vendredi 9 h. L'équipe passera par l'entrée de service.", at: "Hier 14:32" },
-        { from: "client", txt: "Parfait, le gardien sera prévenu. Pouvez-vous aussi regarder la tache dans l'ascenseur B ?", at: "Hier 15:04" },
-        { from: "econet", txt: "C'est noté - on la traite vendredi, sans supplément 👍", at: "Hier 15:11" }
-      ]
-    };
+    return { clients: [
+      { id: "alizes", name: "Résidence Les Alizés", contact: "M. Lebreton (syndic)", site: "12 rue des Filaos, Saint-Denis · contrat annuel",
+        devis: [
+          { id: "DEV-2026-041", titre: "Entretien des parties communes - contrat annuel", date: dOff(-24), statut: "accepte",
+            lignes: [["Entretien hebdomadaire hall, escaliers, ascenseur (46 sem.)", 46, 120], ["Vitrerie trimestrielle", 4, 180], ["Sortie et nettoyage des bacs (hebdo)", 46, 25]] },
+          { id: "DEV-2026-052", titre: "Remise en état du parking souterrain", date: dOff(-6), statut: "attente",
+            lignes: [["Décapage mécanique des sols (680 m²)", 1, 890], ["Évacuation des encombrants + tri", 1, 240]] }
+        ],
+        factures: [
+          { id: "FAC-2026-118", titre: "Entretien - août 2026", montant: 612.40, statut: "payee", date: dOff(-32) },
+          { id: "FAC-2026-131", titre: "Entretien - septembre 2026", montant: 612.40, statut: "due", echeance: dOff(9) }
+        ],
+        planning: [
+          { d: dOff(1), t: "06:00", dur: "2 h", titre: "Entretien hebdomadaire - hall A & escaliers", rec: "Hebdomadaire" },
+          { d: dOff(4), t: "09:00", dur: "3 h", titre: "Vitrerie - façade & entrée", rec: "Trimestriel" },
+          { d: dOff(8), t: "06:00", dur: "2 h", titre: "Entretien hebdomadaire - hall A & escaliers", rec: "Hebdomadaire" }
+        ],
+        photos: [["copro", "Hall A - après remise en état"], ["chantier", "Parking - décapage en cours"], ["mops", "Entretien hebdomadaire en cours"], ["tri", "Local poubelles - tri sélectif installé"]],
+        messages: [
+          { from: "econet", txt: "Bonjour M. Lebreton ! L'intervention vitrerie est confirmée vendredi 9 h. L'équipe passera par l'entrée de service.", at: "Hier 14:32" },
+          { from: "client", txt: "Parfait, le gardien sera prévenu. Pouvez-vous aussi regarder la tache dans l'ascenseur B ?", at: "Hier 15:04" },
+          { from: "econet", txt: "C'est noté - on la traite vendredi, sans supplément 👍", at: "Hier 15:11" }
+        ] },
+      { id: "grondin", name: "Cabinet dentaire Grondin", contact: "Dr Grondin", site: "Saint-Denis · bionettoyage 3×/sem.",
+        devis: [
+          { id: "DEV-2026-048", titre: "Bionettoyage du cabinet - contrat annuel", date: dOff(-15), statut: "accepte",
+            lignes: [["Bionettoyage 3 passages/semaine (46 sem.)", 138, 45]] }
+        ],
+        factures: [{ id: "FAC-2026-125", titre: "Bionettoyage - août 2026", montant: 517.50, statut: "payee", date: dOff(-20) }],
+        planning: [{ d: dOff(2), t: "07:00", dur: "1 h 30", titre: "Bionettoyage du cabinet", rec: "3×/semaine" }],
+        photos: [["medical", "Salle de soins - après bionettoyage"]],
+        messages: [{ from: "client", txt: "Pouvez-vous décaler le passage de jeudi à 6 h 30 ?", at: "Hier 09:12" }] },
+      { id: "mairie", name: "Mairie annexe - Le Port", contact: "Service technique", site: "Le Port · gymnase + école",
+        devis: [
+          { id: "DEV-2026-051", titre: "Remise en état du gymnase", date: dOff(-4), statut: "attente",
+            lignes: [["Décapage et métallisation du sol sportif", 1, 1450]] }
+        ],
+        factures: [],
+        planning: [{ d: dOff(6), t: "08:00", dur: "4 h", titre: "Visite technique du gymnase", rec: "Ponctuel" }],
+        photos: [["collectivites", "Couloir de l'école - entretien"]],
+        messages: [] },
+      { id: "horizon", name: "SARL Horizon Bureaux", contact: "Mme Payet", site: "Sainte-Marie · bureaux 2×/sem.",
+        devis: [],
+        factures: [{ id: "FAC-2026-129", titre: "Entretien bureaux - août 2026", montant: 389.90, statut: "due", echeance: dOff(3) }],
+        planning: [{ d: dOff(1), t: "18:30", dur: "1 h 30", titre: "Entretien des bureaux", rec: "2×/semaine" }],
+        photos: [["commercial", "Open space - entretien du soir"]],
+        messages: [] }
+    ]};
   }
   var ptMem = null;
   function ptRead(){
@@ -566,7 +597,22 @@
   function ptWrite(data){
     ptMem = data;
     try { localStorage.setItem(PT_KEY, JSON.stringify(data)); } catch(e){}
-    renderClient(); renderDevisAdmin();
+    renderClient(); renderClients(); renderDevisAdmin();
+  }
+  function ptClientById(id){ return ptRead().clients.find(function(c){ return c.id === id; }); }
+  function ptClient(){ return ptClientById("alizes"); }
+  function devisOwner(id){
+    var cls = ptRead().clients;
+    for (var i = 0; i < cls.length; i++) {
+      var d = cls[i].devis.find(function(x){ return x.id === id; });
+      if (d) return { d: d, cl: cls[i] };
+    }
+    return null;
+  }
+  function allDevis(){
+    var out = [];
+    ptRead().clients.forEach(function(c){ c.devis.forEach(function(d){ out.push({ d: d, cl: c }); }); });
+    return out;
   }
   function devisTotals(lignes){
     var ht = 0;
@@ -574,20 +620,19 @@
     var tva = ht * 0.085;
     return { ht: ht, tva: tva, ttc: ht + tva };
   }
-  function fmtD2(iso){ var p = iso.split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
+  function phSrc(ph){ return ph[0] && ph[0].indexOf("data:") === 0 ? ph[0] : IMGS[ph[0]]; }
 
-  /* modal devis */
+  /* ----- modal devis ----- */
   var mv = document.getElementById("mv");
   function openDevis(id){
-    var p = ptRead();
-    var d = p.devis.find(function(x){ return x.id === id; });
-    if (!d) return;
-    var t = devisTotals(d.lignes);
+    var o = devisOwner(id);
+    if (!o) return;
+    var d = o.d, t = devisTotals(d.lignes);
     var rows = d.lignes.map(function(l){
       return "<tr><td>" + l[0] + "</td><td class='num'>" + l[1] + "</td><td class='num'>" + eur(+l[2]) + "</td><td class='num'>" + eur(l[1]*l[2]) + "</td></tr>";
     }).join("");
     document.getElementById("mv-body").innerHTML =
-      "<p class='eyebrow'>Devis " + d.id + " · " + fmtD2(d.date) + "</p>" +
+      "<p class='eyebrow'>Devis " + d.id + " · " + fmtD2(d.date) + " · " + o.cl.name + "</p>" +
       "<h2 style='font-size:22px;margin-top:10px'>" + d.titre + "</h2>" +
       "<table class='dv-table'><thead><tr><th>Désignation</th><th style='text-align:right'>Qté</th><th style='text-align:right'>PU HT</th><th style='text-align:right'>Total HT</th></tr></thead><tbody>" + rows + "</tbody></table>" +
       "<div class='dv-tot'><div><span>Total HT</span><b>" + eur(t.ht) + "</b></div>" +
@@ -603,12 +648,11 @@
   document.getElementById("mv-body").addEventListener("click", function(e){
     var el = e.target.closest("[data-accept]");
     if (!el) return;
-    var p = ptRead();
-    var d = p.devis.find(function(x){ return x.id === el.dataset.accept; });
-    if (d) { d.statut = "accepte"; ptWrite(p); mv.hidden = true; notify("Devis accepté - EcoNet est prévenu et planifie l'intervention (démo) ✅"); }
+    var o = devisOwner(el.dataset.accept);
+    if (o) { o.d.statut = "accepte"; ptWrite(ptRead()); mv.hidden = true; notify("Devis accepté - EcoNet est prévenu et planifie l'intervention (démo) ✅"); }
   });
 
-  /* rendu espace client */
+  /* ----- espace client (compte démo : Les Alizés) ----- */
   function clAuthed(){ try { return sessionStorage.getItem("econet_client") === "1"; } catch(e){ return false; } }
   function renderClient(){
     var page = document.querySelector('[data-page="client"]');
@@ -617,23 +661,23 @@
     document.getElementById("cl-gate").style.display = ok ? "none" : "";
     document.getElementById("cl-app").style.display = ok ? "" : "none";
     if (!ok) return;
-    var p = ptRead();
-    document.getElementById("cl-name").textContent = "Bonjour, " + p.client.name + " 👋";
-    document.getElementById("cl-site").textContent = p.client.contact + " · " + p.client.site;
-    var due = p.factures.find(function(f){ return f.statut === "due"; });
+    var c = ptClient();
+    document.getElementById("cl-name").textContent = "Bonjour, " + c.name + " 👋";
+    document.getElementById("cl-site").textContent = c.contact + " · " + c.site;
+    var due = c.factures.find(function(f){ return f.statut === "due"; });
     document.getElementById("cl-remind").innerHTML = due
       ? "<div class='cl-remind'>⏰ Rappel : la facture <b>&nbsp;" + due.id + "&nbsp;</b> (" + eur(due.montant) + ") arrive à échéance le <b>&nbsp;" + fmtD2(due.echeance) + "</b>.</div>"
       : "";
-    document.getElementById("cl-plan-n").textContent = p.planning.length;
-    document.getElementById("cl-plan").innerHTML = p.planning.map(function(i){
+    document.getElementById("cl-plan-n").textContent = c.planning.length;
+    document.getElementById("cl-plan").innerHTML = c.planning.map(function(i){
       var dt = i.d.split("-");
       return "<div class='plan-item'><div class='pd'><b>" + dt[2] + "</b><span>" + MOISN[+dt[1]-1] + "</span></div>" +
         "<div class='pi-t'><b>" + i.titre + "</b><span>" + i.t + " · " + i.dur + "</span></div>" +
         "<span class='rec'>" + i.rec + "</span></div>";
     }).join("");
-    var att = p.devis.filter(function(d){ return d.statut === "attente"; }).length;
-    document.getElementById("cl-devis-n").textContent = att ? att + " à signer" : p.devis.length;
-    document.getElementById("cl-devis").innerHTML = p.devis.map(function(d){
+    var att = c.devis.filter(function(d){ return d.statut === "attente"; }).length;
+    document.getElementById("cl-devis-n").textContent = att ? att + " à signer" : c.devis.length;
+    document.getElementById("cl-devis").innerHTML = c.devis.map(function(d){
       var t = devisTotals(d.lignes);
       return "<div class='doc-row'><span class='dr-t'><b>" + d.titre + "</b><span>" + d.id + " · " + fmtD2(d.date) + "</span></span>" +
         "<span class='dr-m'>" + eur(t.ttc) + "</span>" +
@@ -641,17 +685,17 @@
         "<span class='doc-act' data-devis='" + d.id + "'>Voir le devis</span>" +
         "<span class='doc-act' data-pdf='" + d.id + "'>PDF ⬇</span></div>";
     }).join("");
-    document.getElementById("cl-fact").innerHTML = p.factures.map(function(f){
+    document.getElementById("cl-fact").innerHTML = c.factures.map(function(f){
       return "<div class='doc-row'><span class='dr-t'><b>" + f.titre + "</b><span>" + f.id + "</span></span>" +
         "<span class='dr-m'>" + eur(f.montant) + "</span>" +
         "<span class='st-chip " + (f.statut === "payee" ? "ok'>Payée" : "due'>Échéance " + fmtD2(f.echeance)) + "</span>" +
         (f.statut === "due" ? "<span class='doc-act' data-pay='" + f.id + "'>Payer en ligne</span>" : "") + "</div>";
     }).join("");
-    document.getElementById("cl-photos").innerHTML = p.photos.map(function(ph){
-      return "<figure><img loading='lazy' src='" + phSrc(ph) + "' alt='" + ph[1] + "'><figcaption>" + ph[1] + "</figcaption></figure>";
+    document.getElementById("cl-photos").innerHTML = c.photos.map(function(ph){
+      return "<figure><img src='" + phSrc(ph) + "' alt='" + ph[1] + "'><figcaption>" + ph[1] + "</figcaption></figure>";
     }).join("");
     var chat = document.getElementById("cl-chat");
-    chat.innerHTML = p.messages.map(function(m){
+    chat.innerHTML = c.messages.map(function(m){
       return "<div class='msg " + m.from + "'>" + m.txt + "<small>" + (m.from === "econet" ? "EcoNet · " : "Vous · ") + m.at + "</small></div>";
     }).join("");
     chat.scrollTop = chat.scrollHeight;
@@ -676,13 +720,143 @@
     var inp = document.getElementById("cl-msg");
     var txt = inp.value.trim();
     if (!txt) return;
-    var p = ptRead();
-    p.messages.push({ from: "client", txt: txt, at: "À l'instant" });
+    var c = ptClient();
+    c.messages.push({ from: "client", txt: txt, at: "À l'instant" });
     inp.value = "";
-    ptWrite(p);
+    ptWrite(ptRead());
   });
 
-  /* créateur de devis (admin) */
+  /* ----- back-office : vues ----- */
+  var AV = "dash";
+  try { AV = sessionStorage.getItem("econet_av") || "dash"; } catch(e){}
+  function applyView(){
+    document.querySelectorAll("#admin-app .aview").forEach(function(v){ v.hidden = v.dataset.view !== AV; });
+    document.querySelectorAll("#admin-app .av-tab").forEach(function(b){ b.classList.toggle("on", b.dataset.av === AV); });
+  }
+  document.getElementById("admin-app").addEventListener("click", function(e){
+    var tab = e.target.closest(".av-tab");
+    if (tab) {
+      AV = tab.dataset.av;
+      try { sessionStorage.setItem("econet_av", AV); } catch(err){}
+      applyView();
+    }
+  });
+
+  /* ----- vue Clients : portefeuille + fiche ----- */
+  var FICHE_ID = null;
+  function renderClients(){
+    var list = document.getElementById("cl-list");
+    if (!list) return;
+    var p = ptRead();
+    document.getElementById("cl-count").textContent = p.clients.length;
+    list.innerHTML = p.clients.map(function(c){
+      var att = c.devis.filter(function(d){ return d.statut === "attente"; }).length;
+      var due = c.factures.filter(function(f){ return f.statut === "due"; }).length;
+      var aRepondre = c.messages.length && c.messages[c.messages.length - 1].from === "client";
+      return "<button class='client-row' data-fiche='" + c.id + "'>" +
+        "<span class='av'>" + initiales(c.name) + "</span>" +
+        "<span class='cr-t'><b>" + c.name + "</b><span>" + c.contact + " · " + c.site + "</span></span>" +
+        "<span class='cr-badges'>" +
+        (att ? "<span class='st-chip wait'>" + att + " devis à signer</span>" : "") +
+        (due ? "<span class='st-chip due'>" + due + " facture" + (due > 1 ? "s" : "") + " à encaisser</span>" : "") +
+        (aRepondre ? "<span class='st-chip ok'>💬 à répondre</span>" : "") +
+        "</span><span class='cr-go'>›</span></button>";
+    }).join("");
+    document.getElementById("cl-listwrap").hidden = !!FICHE_ID;
+    document.getElementById("fc-detail").hidden = !FICHE_ID;
+    if (FICHE_ID) renderFiche(FICHE_ID);
+  }
+  function renderFiche(cid){
+    var c = ptClientById(cid);
+    if (!c) { FICHE_ID = null; return; }
+    document.getElementById("fc-detail").dataset.cid = cid;
+    document.getElementById("fc-name").textContent = c.name;
+    document.getElementById("fc-photos").innerHTML = c.photos.map(function(ph, i){
+      return "<figure><img src='" + phSrc(ph) + "' alt=''><figcaption>" + ph[1] + "</figcaption><button class='ph-del' data-delphoto='" + i + "' aria-label='Retirer la photo'>✕</button></figure>";
+    }).join("") || "<p class='admin-note'>Aucune photo pour l'instant.</p>";
+    document.getElementById("fc-fact").innerHTML = c.factures.map(function(f, i){
+      return "<div class='doc-row'><span class='dr-t'><b>" + f.titre + "</b><span>" + f.id + "</span></span>" +
+        "<span class='dr-m'>" + eur(f.montant) + "</span>" +
+        "<span class='st-chip " + (f.statut === "payee" ? "ok'>Payée" : "due'>Échéance " + fmtD2(f.echeance)) + "</span>" +
+        (f.statut === "due" ? "<span class='doc-act' data-payer='" + i + "'>Marquer payée</span>" : "") + "</div>";
+    }).join("") || "<p class='admin-note'>Aucune facture.</p>";
+    var chat = document.getElementById("fc-chat");
+    chat.innerHTML = c.messages.map(function(m){
+      return "<div class='msg " + (m.from === "econet" ? "client" : "econet") + "'>" + m.txt +
+        "<small>" + (m.from === "econet" ? "Vous (EcoNet) · " : c.contact + " · ") + m.at + "</small></div>";
+    }).join("") || "<p class='admin-note'>Aucun échange pour l'instant.</p>";
+    chat.scrollTop = chat.scrollHeight;
+  }
+  function ficheClient(){ return ptClientById(document.getElementById("fc-detail").dataset.cid); }
+  document.getElementById("admin-app").addEventListener("click", function(e){
+    var el;
+    if ((el = e.target.closest("[data-fiche]"))) { FICHE_ID = el.dataset.fiche; renderClients(); }
+    else if (e.target.closest("#fc-back")) { FICHE_ID = null; renderClients(); }
+    else if ((el = e.target.closest("[data-delphoto]"))) {
+      var c = ficheClient();
+      c.photos.splice(+el.dataset.delphoto, 1);
+      ptWrite(ptRead());
+      notify("Photo retirée de l'espace client");
+    } else if ((el = e.target.closest("[data-payer]"))) {
+      var c2 = ficheClient();
+      c2.factures[+el.dataset.payer].statut = "payee";
+      ptWrite(ptRead());
+      notify("Facture marquée payée ✅");
+    }
+  });
+  document.getElementById("fc-send").addEventListener("click", function(){
+    var inp = document.getElementById("fc-msg");
+    var txt = inp.value.trim();
+    if (!txt) return;
+    ficheClient().messages.push({ from: "econet", txt: txt, at: "À l'instant" });
+    inp.value = "";
+    ptWrite(ptRead());
+    notify("Réponse envoyée au client ✅");
+  });
+  document.getElementById("fc-msg").addEventListener("keydown", function(e){
+    if (e.key === "Enter") document.getElementById("fc-send").click();
+  });
+  document.getElementById("fc-fact-add").addEventListener("click", function(){
+    var titre = document.getElementById("fc-f-titre").value.trim();
+    var montant = parseFloat(String(document.getElementById("fc-f-montant").value).replace(",", "."));
+    if (!titre || !(montant > 0)) { notify("Indiquez l'objet et le montant de la facture."); return; }
+    var ech = new Date(); ech.setDate(ech.getDate() + 30);
+    var totalFact = 0;
+    ptRead().clients.forEach(function(c){ totalFact += c.factures.length; });
+    ficheClient().factures.push({ id: "FAC-2026-" + (140 + totalFact), titre: titre, montant: montant, statut: "due", echeance: isoD(ech) });
+    ptWrite(ptRead());
+    document.getElementById("fc-f-titre").value = "";
+    document.getElementById("fc-f-montant").value = "";
+    notify("Facture émise - visible dans l'espace client, avec rappel d'échéance ✅");
+  });
+  var fcFile = document.getElementById("fc-photo-file");
+  fcFile.addEventListener("change", function(){
+    var f = fcFile.files && fcFile.files[0];
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        var MAX = 800;
+        var k = Math.min(1, MAX / Math.max(img.width, img.height));
+        var c = document.createElement("canvas");
+        c.width = Math.round(img.width * k);
+        c.height = Math.round(img.height * k);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        var url = c.toDataURL("image/jpeg", 0.72);
+        var cap = (document.getElementById("fc-photo-cap").value || "").trim() || ("Photo du " + fmtD2(isoD(new Date())));
+        ficheClient().photos.push([url, cap]);
+        try { ptWrite(ptRead()); notify("Photo ajoutée - visible dans l'espace client 📷"); }
+        catch(e){ notify("Stockage local plein : supprimez une photo avant d'en ajouter (limite de la démo)."); }
+        document.getElementById("fc-photo-cap").value = "";
+        fcFile.value = "";
+      };
+      img.src = rd.result;
+    };
+    rd.readAsDataURL(f);
+  });
+
+  /* ----- vue Devis : créateur multi-clients + liste globale ----- */
   function dvLineHTML(des, q, pu){
     return "<div class='dv-line'><input class='dv-des' placeholder='Désignation' value=\"" + (des || "") + "\">" +
       "<input class='dv-q' type='number' min='1' value='" + (q || 1) + "'>" +
@@ -704,133 +878,55 @@
   function renderDevisAdmin(){
     var list = document.getElementById("dv-list");
     if (!list) return;
-    var p = ptRead();
-    list.innerHTML = "<label>Devis envoyés</label>" + p.devis.map(function(d){
-      var t = devisTotals(d.lignes);
-      return "<div class='doc-row'><span class='dr-t'><b>" + d.titre + "</b><span>" + d.id + "</span></span>" +
+    var sel = document.getElementById("dv-client");
+    var cur = sel.value;
+    sel.innerHTML = ptRead().clients.map(function(c){
+      return "<option value='" + c.id + "'>" + c.name + "</option>";
+    }).join("");
+    if (cur) sel.value = cur;
+    list.innerHTML = allDevis().map(function(o){
+      var t = devisTotals(o.d.lignes);
+      return "<div class='doc-row'><span class='dr-t'><b>" + o.d.titre + "</b><span>" + o.d.id + " · " + o.cl.name + "</span></span>" +
         "<span class='dr-m'>" + eur(t.ttc) + "</span>" +
-        "<span class='st-chip " + (d.statut === "accepte" ? "ok'>Accepté" : "wait'>En attente") + "</span></div>";
+        "<span class='st-chip " + (o.d.statut === "accepte" ? "ok'>Accepté" : "wait'>En attente") + "</span>" +
+        "<span class='doc-act' data-pdf='" + o.d.id + "'>PDF ⬇</span></div>";
     }).join("");
   }
   var dvWrap = document.getElementById("dv-lines");
-  if (dvWrap) {
+  dvWrap.innerHTML = dvLineHTML("", 1, "");
+  dvTotalsRender();
+  document.getElementById("dv-add").addEventListener("click", function(){
+    dvWrap.insertAdjacentHTML("beforeend", dvLineHTML("", 1, ""));
+  });
+  dvWrap.addEventListener("input", dvTotalsRender);
+  dvWrap.addEventListener("click", function(e){
+    if (e.target.closest(".rm") && dvWrap.children.length > 1) { e.target.closest(".dv-line").remove(); dvTotalsRender(); }
+  });
+  document.getElementById("dv-send").addEventListener("click", function(){
+    var titre = document.getElementById("dv-titre").value.trim();
+    var lignes = dvLines();
+    var cl = ptClientById(document.getElementById("dv-client").value);
+    if (!titre) { notify("Donnez un objet au devis."); return; }
+    if (!lignes.length) { notify("Ajoutez au moins une ligne complète (désignation, quantité, prix)."); return; }
+    if (!cl) { notify("Sélectionnez un client."); return; }
+    cl.devis.push({ id: "DEV-2026-0" + (53 + allDevis().length), titre: titre, date: isoD(new Date()), statut: "attente", lignes: lignes });
+    ptWrite(ptRead());
+    document.getElementById("dv-titre").value = "";
     dvWrap.innerHTML = dvLineHTML("", 1, "");
     dvTotalsRender();
-    document.getElementById("dv-add").addEventListener("click", function(){
-      dvWrap.insertAdjacentHTML("beforeend", dvLineHTML("", 1, ""));
-    });
-    dvWrap.addEventListener("input", dvTotalsRender);
-    dvWrap.addEventListener("click", function(e){
-      if (e.target.closest(".rm") && dvWrap.children.length > 1) { e.target.closest(".dv-line").remove(); dvTotalsRender(); }
-    });
-    document.getElementById("dv-send").addEventListener("click", function(){
-      var titre = document.getElementById("dv-titre").value.trim();
-      var lignes = dvLines();
-      if (!titre) { notify("Donnez un objet au devis."); return; }
-      if (!lignes.length) { notify("Ajoutez au moins une ligne complète (désignation, quantité, prix)."); return; }
-      var p = ptRead();
-      var num = 52 + p.devis.length;
-      p.devis.push({ id: "DEV-2026-0" + num, titre: titre, date: isoD(new Date()), statut: "attente", lignes: lignes });
-      ptWrite(p);
-      document.getElementById("dv-titre").value = "";
-      dvWrap.innerHTML = dvLineHTML("", 1, "");
-      dvTotalsRender();
-      notify("Devis envoyé - visible immédiatement dans l'espace client ✅");
-    });
-    renderDevisAdmin();
-  }
+    notify("Devis envoyé à " + cl.name + " - visible dans son espace client ✅");
+  });
 
-  /* ----- Fiche client (espace pro) : photos, factures, messagerie ----- */
-  function phSrc(ph){ return ph[0] && ph[0].indexOf("data:") === 0 ? ph[0] : IMGS[ph[0]]; }
-  function renderFiche(){
-    var box = document.getElementById("fc-photos");
-    if (!box) return;
-    var p = ptRead();
-    document.getElementById("fc-name").textContent = p.client.name;
-    box.innerHTML = p.photos.map(function(ph, i){
-      return "<figure><img loading='lazy' src='" + phSrc(ph) + "' alt=''><figcaption>" + ph[1] + "</figcaption><button class='ph-del' data-delphoto='" + i + "' aria-label='Retirer la photo'>✕</button></figure>";
-    }).join("") || "<p class='admin-note'>Aucune photo pour l'instant.</p>";
-    document.getElementById("fc-fact").innerHTML = p.factures.map(function(f, i){
-      return "<div class='doc-row'><span class='dr-t'><b>" + f.titre + "</b><span>" + f.id + "</span></span>" +
-        "<span class='dr-m'>" + eur(f.montant) + "</span>" +
-        "<span class='st-chip " + (f.statut === "payee" ? "ok'>Payée" : "due'>Échéance " + fmtD2(f.echeance)) + "</span>" +
-        (f.statut === "due" ? "<span class='doc-act' data-payer='" + i + "'>Marquer payée</span>" : "") + "</div>";
-    }).join("");
-    var chat = document.getElementById("fc-chat");
-    chat.innerHTML = p.messages.map(function(m){
-      return "<div class='msg " + (m.from === "econet" ? "client" : "econet") + "'>" + m.txt +
-        "<small>" + (m.from === "econet" ? "Vous (EcoNet) · " : p.client.contact + " · ") + m.at + "</small></div>";
-    }).join("");
-    chat.scrollTop = chat.scrollHeight;
-  }
-  var fcFile = document.getElementById("fc-photo-file");
-  if (fcFile) {
-    fcFile.addEventListener("change", function(){
-      var f = fcFile.files && fcFile.files[0];
-      if (!f) return;
-      var rd = new FileReader();
-      rd.onload = function(){
-        var img = new Image();
-        img.onload = function(){
-          var MAX = 800;
-          var k = Math.min(1, MAX / Math.max(img.width, img.height));
-          var c = document.createElement("canvas");
-          c.width = Math.round(img.width * k);
-          c.height = Math.round(img.height * k);
-          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-          var url = c.toDataURL("image/jpeg", 0.72);
-          var cap = (document.getElementById("fc-photo-cap").value || "").trim() || ("Photo du " + fmtD2(isoD(new Date())));
-          var p = ptRead();
-          p.photos.push([url, cap]);
-          try { ptWrite(p); notify("Photo ajoutée - visible dans l'espace client 📷"); }
-          catch(e){ notify("Stockage local plein : supprimez une photo avant d'en ajouter (limite de la démo)."); }
-          document.getElementById("fc-photo-cap").value = "";
-          fcFile.value = "";
-        };
-        img.src = rd.result;
-      };
-      rd.readAsDataURL(f);
-    });
-    document.getElementById("fc-send").addEventListener("click", function(){
-      var inp = document.getElementById("fc-msg");
-      var txt = inp.value.trim();
-      if (!txt) return;
-      var p = ptRead();
-      p.messages.push({ from: "econet", txt: txt, at: "À l'instant" });
-      inp.value = "";
-      ptWrite(p);
-      notify("Réponse envoyée au client ✅");
-    });
-    document.getElementById("fc-msg").addEventListener("keydown", function(e){
-      if (e.key === "Enter") document.getElementById("fc-send").click();
-    });
-    document.getElementById("fc-fact-add").addEventListener("click", function(){
-      var titre = document.getElementById("fc-f-titre").value.trim();
-      var montant = parseFloat(String(document.getElementById("fc-f-montant").value).replace(",", "."));
-      if (!titre || !(montant > 0)) { notify("Indiquez l'objet et le montant de la facture."); return; }
-      var p = ptRead();
-      var ech = new Date(); ech.setDate(ech.getDate() + 30);
-      p.factures.push({ id: "FAC-2026-" + (140 + p.factures.length), titre: titre, montant: montant, statut: "due", echeance: isoD(ech) });
-      ptWrite(p);
-      document.getElementById("fc-f-titre").value = "";
-      document.getElementById("fc-f-montant").value = "";
-      notify("Facture émise - visible dans l'espace client, avec rappel d'échéance ✅");
-    });
-    document.getElementById("admin-app").addEventListener("click", function(e){
-      var el;
-      if ((el = e.target.closest("[data-delphoto]"))) {
-        var p = ptRead();
-        p.photos.splice(+el.dataset.delphoto, 1);
-        ptWrite(p);
-        notify("Photo retirée de l'espace client");
-      } else if ((el = e.target.closest("[data-payer]"))) {
-        var p2 = ptRead();
-        p2.factures[+el.dataset.payer].statut = "payee";
-        ptWrite(p2);
-        notify("Facture marquée payée ✅");
-      }
-    });
-  }
+  /* sync live du portail entre onglets */
+  addEventListener("storage", function(e){
+    if (e.key !== PT_KEY || !e.newValue) return;
+    function totalMsgs(p){ var n = 0; (p && p.clients || []).forEach(function(c){ n += c.messages.length; }); return n; }
+    var before = totalMsgs(ptMem);
+    try { ptMem = JSON.parse(e.newValue); } catch(err){ return; }
+    var adminOn2 = document.querySelector('[data-page="admin"]').classList.contains("on");
+    if (adminOn2 && totalMsgs(ptMem) > before) notify("💬 Nouveau message client dans le portefeuille");
+    renderClient(); renderClients(); renderDevisAdmin();
+  });
 
   /* ----- PDF du devis (jsPDF + capability downloads) ----- */
   function logoJpeg(){
@@ -852,11 +948,10 @@
       return c.toDataURL("image/jpeg", 0.92);
     } catch(e){ return null; }
   }
-  function devisPDF(d){
+  function devisPDF(d, cl){
     var JS = window.jspdf && window.jspdf.jsPDF;
     if (!JS) return null;
     var doc = new JS({ unit: "mm", format: "a4" });
-    var p = ptRead();
     var GREEN = [125,182,63], GDARK = [63,122,46], INK = [27,42,33], MUT = [92,112,98], PALE = [239,246,228], LINE = [211,224,203];
     var W = 210, ML = 18, MR = 192;
 
@@ -895,11 +990,11 @@
     doc.text("ADRESSÉ À", 118, 55);
     doc.setFontSize(10.5);
     doc.setTextColor(INK[0],INK[1],INK[2]);
-    doc.text(p.client.name, 118, 61.5);
+    doc.text(cl.name, 118, 61.5);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-    doc.text(doc.splitTextToSize(p.client.contact + "\n" + p.client.site, 68), 118, 67, {lineHeightFactor: 1.45});
+    doc.text(doc.splitTextToSize(cl.contact + "\n" + cl.site, 68), 118, 67, {lineHeightFactor: 1.45});
 
     /* objet */
     y = 92;
@@ -980,17 +1075,17 @@
     return doc;
   }
   window.__pdfTest = function(){
-    var d = ptRead().devis[0];
-    var doc = devisPDF(d);
+    var c0 = ptRead().clients[0];
+    var doc = devisPDF(c0.devis[0], c0);
     return doc ? doc.output("arraybuffer") : null;
   };
   var pdfBusy = false;
   function downloadDevis(id){
     if (pdfBusy) return;
-    var p = ptRead();
-    var d = p.devis.find(function(x){ return x.id === id; });
-    if (!d) return;
-    var doc = devisPDF(d);
+    var o = devisOwner(id);
+    if (!o) return;
+    var d = o.d;
+    var doc = devisPDF(d, o.cl);
     if (!doc) { notify("Génération PDF indisponible (bibliothèque non chargée)."); return; }
     var blob = doc.output("blob");
     var filename = d.id + ".pdf";
