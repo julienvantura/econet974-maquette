@@ -639,17 +639,82 @@
       "<div><span>TVA 8,5 % (La Réunion)</span><b>" + eur(t.tva) + "</b></div>" +
       "<div class='ttc'><span>Total TTC</span><b>" + eur(t.ttc) + "</b></div></div>" +
       (d.statut === "attente"
-        ? "<div style='display:flex;gap:10px;flex-wrap:wrap'><button class='btn btn-p' style='flex:1' data-accept='" + d.id + "'>Accepter le devis</button><button class='btn btn-o' data-pdf='" + d.id + "'>Télécharger le PDF</button></div><p class='admin-note' style='text-align:center'>Signature électronique sur le site final - ceci est une démo.</p>"
-        : "<div style='display:flex;gap:12px;align-items:center;flex-wrap:wrap'><span class='st-chip ok'>Devis accepté</span><button class='btn btn-o' data-pdf='" + d.id + "'>Télécharger le PDF</button></div>");
+        ? "<div id='sig-wrap'></div><div style='display:flex;gap:10px;flex-wrap:wrap' id='sig-cta'><button class='btn btn-p' style='flex:1' data-sign='" + d.id + "'>✍️ Signer et accepter le devis</button><button class='btn btn-o' data-pdf='" + d.id + "'>Télécharger le PDF</button></div><p class='admin-note' style='text-align:center'>Signature de démonstration - en production, via un prestataire de signature qualifié (eIDAS).</p>"
+        : "<div style='display:flex;gap:12px;align-items:center;flex-wrap:wrap'><span class='st-chip ok'>" + (d.signature ? "✍️ Devis signé" : "Devis accepté") + "</span><button class='btn btn-o' data-pdf='" + d.id + "'>Télécharger le PDF</button></div>" +
+          (d.signature ? "<div class='sig-view'><img src='" + d.signature.img + "' alt='Signature'><span>Bon pour accord - signé le " + d.signature.at + "<br>par " + d.signature.by + "</span></div>" : ""));
     mv.hidden = false;
   }
   document.getElementById("mv-x").addEventListener("click", function(){ mv.hidden = true; });
   mv.addEventListener("click", function(e){ if (e.target === mv) mv.hidden = true; });
+  function mountSigPad(id){
+    var wrap = document.getElementById("sig-wrap");
+    if (!wrap) return;
+    wrap.innerHTML =
+      "<div class='sig-box'>" +
+      "<p>Signez dans le cadre ci-dessous (doigt ou souris) :</p>" +
+      "<canvas id='sigPad' width='520' height='160'></canvas>" +
+      "<div class='sig-actions'><button class='doc-act' id='sig-clear' style='background:none;border:none;padding:0'>Effacer</button></div>" +
+      "<label class='sig-check'><input type='checkbox' id='sig-ok'><span>J'ai lu le devis et je l'accepte - <b>bon pour accord</b>.</span></label>" +
+      "<button class='btn btn-p' style='width:100%' data-signconfirm='" + id + "'>Valider ma signature</button>" +
+      "</div>";
+    var cta = document.getElementById("sig-cta");
+    if (cta) cta.style.display = "none";
+    var pad = document.getElementById("sigPad");
+    var ctx2 = pad.getContext("2d");
+    ctx2.lineWidth = 2.4;
+    ctx2.lineCap = "round";
+    ctx2.lineJoin = "round";
+    ctx2.strokeStyle = "#1B2A21";
+    var drawing = false, hasInk = false;
+    function pos(e){
+      var r = pad.getBoundingClientRect();
+      return { x: (e.clientX - r.left) * (pad.width / r.width), y: (e.clientY - r.top) * (pad.height / r.height) };
+    }
+    pad.addEventListener("pointerdown", function(e){
+      drawing = true; hasInk = true;
+      pad.setPointerCapture(e.pointerId);
+      var p = pos(e);
+      ctx2.beginPath();
+      ctx2.moveTo(p.x, p.y);
+      ctx2.lineTo(p.x + 0.1, p.y + 0.1);
+      ctx2.stroke();
+      e.preventDefault();
+    });
+    pad.addEventListener("pointermove", function(e){
+      if (!drawing) return;
+      var p = pos(e);
+      ctx2.lineTo(p.x, p.y);
+      ctx2.stroke();
+      e.preventDefault();
+    });
+    pad.addEventListener("pointerup", function(){ drawing = false; });
+    document.getElementById("sig-clear").addEventListener("click", function(){
+      ctx2.clearRect(0, 0, pad.width, pad.height);
+      hasInk = false;
+    });
+    pad.__hasInk = function(){ return hasInk; };
+  }
   document.getElementById("mv-body").addEventListener("click", function(e){
-    var el = e.target.closest("[data-accept]");
-    if (!el) return;
-    var o = devisOwner(el.dataset.accept);
-    if (o) { o.d.statut = "accepte"; ptWrite(ptRead()); mv.hidden = true; notify("Devis accepté - EcoNet est prévenu et planifie l'intervention (démo) ✅"); }
+    var el;
+    if ((el = e.target.closest("[data-sign]"))) {
+      mountSigPad(el.dataset.sign);
+    } else if ((el = e.target.closest("[data-signconfirm]"))) {
+      var pad = document.getElementById("sigPad");
+      if (!document.getElementById("sig-ok").checked) { notify("Cochez la case « bon pour accord » pour valider."); return; }
+      if (!pad || !pad.__hasInk()) { notify("Signez dans le cadre avant de valider ✍️"); return; }
+      var o = devisOwner(el.dataset.signconfirm);
+      if (!o) return;
+      var now = new Date();
+      o.d.statut = "accepte";
+      o.d.signature = {
+        img: pad.toDataURL("image/png"),
+        at: fmtD2(isoD(now)) + " à " + String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0"),
+        by: o.cl.contact
+      };
+      ptWrite(ptRead());
+      openDevis(o.d.id);
+      notify("Devis signé ✅ EcoNet est prévenu et planifie l'intervention (démo)");
+    }
   });
 
   /* ----- espace client (compte démo : Les Alizés) ----- */
@@ -681,7 +746,7 @@
       var t = devisTotals(d.lignes);
       return "<div class='doc-row'><span class='dr-t'><b>" + d.titre + "</b><span>" + d.id + " · " + fmtD2(d.date) + "</span></span>" +
         "<span class='dr-m'>" + eur(t.ttc) + "</span>" +
-        "<span class='st-chip " + (d.statut === "accepte" ? "ok'>Accepté" : "wait'>À signer") + "</span>" +
+        "<span class='st-chip " + (d.statut === "accepte" ? (d.signature ? "ok'>✍️ Signé" : "ok'>Accepté") : "wait'>À signer") + "</span>" +
         "<span class='doc-act' data-devis='" + d.id + "'>Voir le devis</span>" +
         "<span class='doc-act' data-pdf='" + d.id + "'>PDF ⬇</span></div>";
     }).join("");
@@ -923,7 +988,7 @@
       var t = devisTotals(o.d.lignes);
       return "<div class='doc-row'><span class='dr-t'><b>" + o.d.titre + "</b><span>" + o.d.id + " · " + o.cl.name + "</span></span>" +
         "<span class='dr-m'>" + eur(t.ttc) + "</span>" +
-        "<span class='st-chip " + (o.d.statut === "accepte" ? "ok'>Accepté" : "wait'>En attente") + "</span>" +
+        "<span class='st-chip " + (o.d.statut === "accepte" ? (o.d.signature ? "ok'>✍️ Signé" : "ok'>Accepté") : "wait'>En attente") + "</span>" +
         "<span class='doc-act' data-pdf='" + o.d.id + "'>PDF ⬇</span></div>";
     }).join("");
   }
@@ -1097,6 +1162,22 @@
     doc.setFontSize(8.2);
     doc.setTextColor(MUT[0],MUT[1],MUT[2]);
     doc.text(doc.splitTextToSize("Conditions : devis gratuit et sans engagement. Acompte de 30 % à la commande, solde à 30 jours. Produits écolabellisés inclus. Assurance responsabilité civile professionnelle. Bon pour accord : signature précédée de la mention « lu et approuvé ».", 174), ML, y, {lineHeightFactor: 1.5});
+    if (d.signature && d.signature.img) {
+      var sy = Math.min(y + 14, 236);
+      doc.setDrawColor(LINE[0],LINE[1],LINE[2]);
+      doc.setLineWidth(.35);
+      doc.roundedRect(124, sy, 68, 38, 2.5, 2.5, "S");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(GDARK[0],GDARK[1],GDARK[2]);
+      doc.text("BON POUR ACCORD", 128, sy + 6);
+      try { doc.addImage(d.signature.img, "PNG", 128, sy + 8, 60, 18); } catch(e){}
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.2);
+      doc.setTextColor(MUT[0],MUT[1],MUT[2]);
+      doc.text("Signé le " + d.signature.at, 128, sy + 31);
+      doc.text(String(d.signature.by || ""), 128, sy + 35);
+    }
     doc.setFillColor(PALE[0],PALE[1],PALE[2]);
     doc.rect(0, 281, W, 16, "F");
     doc.setFontSize(8.5);
