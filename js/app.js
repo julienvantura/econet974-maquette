@@ -754,7 +754,8 @@
       return "<div class='doc-row'><span class='dr-t'><b>" + f.titre + "</b><span>" + f.id + "</span></span>" +
         "<span class='dr-m'>" + eur(f.montant) + "</span>" +
         "<span class='st-chip " + (f.statut === "payee" ? "ok'>Payée" : "due'>Échéance " + fmtD2(f.echeance)) + "</span>" +
-        (f.statut === "due" ? "<span class='doc-act' data-pay='" + f.id + "'>Payer en ligne</span>" : "") + "</div>";
+        (f.statut === "due" ? "<span class='doc-act' data-pay='" + f.id + "'>Payer en ligne</span>" : "") +
+        "<span class='doc-act' data-fpdf='" + f.id + "'>PDF ⬇</span></div>";
     }).join("");
     document.getElementById("cl-photos").innerHTML = c.photos.map(function(ph){
       return "<figure><img src='" + phSrc(ph) + "' alt='" + ph[1] + "'><figcaption>" + ph[1] + "</figcaption></figure>";
@@ -843,7 +844,8 @@
       return "<div class='doc-row'><span class='dr-t'><b>" + f.titre + "</b><span>" + f.id + "</span></span>" +
         "<span class='dr-m'>" + eur(f.montant) + "</span>" +
         "<span class='st-chip " + (f.statut === "payee" ? "ok'>Payée" : "due'>Échéance " + fmtD2(f.echeance)) + "</span>" +
-        (f.statut === "due" ? "<span class='doc-act' data-payer='" + i + "'>Marquer payée</span>" : "") + "</div>";
+        (f.statut === "due" ? "<span class='doc-act' data-payer='" + i + "'>Marquer payée</span>" : "") +
+        "<span class='doc-act' data-fpdf='" + f.id + "'>PDF ⬇</span></div>";
     }).join("") || "<p class='admin-note'>Aucune facture.</p>";
     var chat = document.getElementById("fc-chat");
     chat.innerHTML = c.messages.map(function(m){
@@ -1029,6 +1031,17 @@
   });
 
   /* ----- PDF du devis (jsPDF + capability downloads) ----- */
+  var SOCIETE = {
+    nom: "EcoNet 974",
+    slogan: "Nettoyage professionnel écoresponsable",
+    forme: "Forme juridique et capital : [à compléter]",
+    adresse: "Siège : [adresse à compléter] - La Réunion",
+    immat: "SIRET : [à compléter] · RCS : [à compléter]",
+    tvaintra: "N° TVA intracommunautaire : [à compléter]",
+    contact: "0693 85 68 99 · econet974@gmail.com",
+    assurance: "Assurance RC Pro : [assureur à compléter] - couverture géographique : La Réunion"
+  };
+  var PDF_C = { GREEN: [125,182,63], GDARK: [63,122,46], INK: [27,42,33], MUT: [92,112,98], PALE: [239,246,228], BLEU: [231,244,251], LINE: [211,224,203] };
   function logoJpeg(){
     try {
       var img = document.querySelector(".logo-link img");
@@ -1040,7 +1053,6 @@
       x.fillRect(0, 0, c.width, c.height);
       x.drawImage(img, 0, 0);
       var k = Math.round(c.width * 0.13);
-      x.fillStyle = "#EFF6E4";
       x.fillRect(0, 0, k, k);
       x.fillRect(c.width - k, 0, k, k);
       x.fillRect(0, c.height - k, k, k);
@@ -1048,163 +1060,233 @@
       return c.toDataURL("image/jpeg", 0.92);
     } catch(e){ return null; }
   }
+  function pdfEnTete(doc, bande, titre, lignes){
+    doc.setFillColor(bande[0], bande[1], bande[2]);
+    doc.rect(0, 0, 210, 44, "F");
+    var lj = logoJpeg();
+    if (lj) doc.addImage(lj, "JPEG", 18, 8, 28, 28);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(PDF_C.INK[0], PDF_C.INK[1], PDF_C.INK[2]);
+    doc.setFontSize(26);
+    doc.text(titre, 192, 17, { align: "right" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+    lignes.forEach(function(l, i){ doc.text(l, 192, 24 + i * 5, { align: "right" }); });
+  }
+  function pdfParties(doc, cl){
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(PDF_C.INK[0], PDF_C.INK[1], PDF_C.INK[2]);
+    doc.text(SOCIETE.nom, 18, 54);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.6);
+    doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+    doc.text([SOCIETE.slogan, SOCIETE.forme, SOCIETE.adresse, SOCIETE.immat, SOCIETE.tvaintra, SOCIETE.contact], 18, 59, { lineHeightFactor: 1.5 });
+    doc.setFillColor(PDF_C.BLEU[0], PDF_C.BLEU[1], PDF_C.BLEU[2]);
+    doc.roundedRect(112, 48, 80, 36, 3, 3, "F");
+    doc.setFontSize(7.5);
+    doc.setTextColor(10, 111, 163);
+    doc.setFont("helvetica", "bold");
+    doc.text("CLIENT / ADRESSE DE FACTURATION", 117, 54);
+    doc.setFontSize(10);
+    doc.setTextColor(PDF_C.INK[0], PDF_C.INK[1], PDF_C.INK[2]);
+    doc.text(cl.name, 117, 60);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.4);
+    doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+    doc.text(doc.splitTextToSize(cl.contact + "\n" + cl.site, 70), 117, 65.5, { lineHeightFactor: 1.45 });
+    return 94;
+  }
+  function pdfTable(doc, lignes, y){
+    var C = { des: 18, q: 128, pu: 158, tot: 192 };
+    doc.setFillColor(PDF_C.GREEN[0], PDF_C.GREEN[1], PDF_C.GREEN[2]);
+    doc.rect(16, y - 5.5, 178, 8.5, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8.5);
+    doc.text("DÉSIGNATION DE LA PRESTATION", C.des + 1, y);
+    doc.text("QTÉ", C.q, y, { align: "right" });
+    doc.text("PU HT", C.pu, y, { align: "right" });
+    doc.text("TOTAL HT", C.tot, y, { align: "right" });
+    y += 8;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    lignes.forEach(function(l, i){
+      var txt = doc.splitTextToSize(String(l[0]), 100);
+      var rh = Math.max(8, txt.length * 4.6 + 3.5);
+      if (i % 2 === 1) { doc.setFillColor(250, 252, 247); doc.rect(16, y - 4.5, 178, rh, "F"); }
+      doc.setTextColor(PDF_C.INK[0], PDF_C.INK[1], PDF_C.INK[2]);
+      doc.text(txt, C.des + 1, y);
+      doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+      doc.text(String(l[1]), C.q, y, { align: "right" });
+      doc.text(eur(+l[2]), C.pu, y, { align: "right" });
+      doc.setTextColor(PDF_C.INK[0], PDF_C.INK[1], PDF_C.INK[2]);
+      doc.text(eur(l[1] * l[2]), C.tot, y, { align: "right" });
+      y += rh;
+      doc.setDrawColor(PDF_C.LINE[0], PDF_C.LINE[1], PDF_C.LINE[2]);
+      doc.setLineWidth(.25);
+      doc.line(16, y - 4.2, 194, y - 4.2);
+    });
+    doc.setFontSize(7.2);
+    doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+    doc.text("TVA au taux de 8,5 % (taux applicable à La Réunion) sur l'ensemble des lignes.", 18, y);
+    return y + 3;
+  }
+  function pdfTotaux(doc, t, y){
+    doc.setFillColor(250, 252, 247);
+    doc.roundedRect(118, y - 4, 76, 26, 2.5, 2.5, "F");
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+    doc.text("Total HT", 123, y + 2);
+    doc.text(eur(t.ht), 189, y + 2, { align: "right" });
+    doc.text("TVA 8,5 %", 123, y + 8);
+    doc.text(eur(t.tva), 189, y + 8, { align: "right" });
+    doc.setDrawColor(PDF_C.LINE[0], PDF_C.LINE[1], PDF_C.LINE[2]);
+    doc.line(123, y + 11.5, 189, y + 11.5);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11.5);
+    doc.setTextColor(PDF_C.GDARK[0], PDF_C.GDARK[1], PDF_C.GDARK[2]);
+    doc.text("Total TTC", 123, y + 18);
+    doc.text(eur(t.ttc), 189, y + 18, { align: "right" });
+    return y + 28;
+  }
+  function pdfPied(doc){
+    doc.setFillColor(PDF_C.PALE[0], PDF_C.PALE[1], PDF_C.PALE[2]);
+    doc.rect(0, 279, 210, 18, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(PDF_C.GDARK[0], PDF_C.GDARK[1], PDF_C.GDARK[2]);
+    doc.text("EcoNet 974 - Le propre, naturellement.", 105, 285, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6.8);
+    doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+    doc.text(SOCIETE.immat + " · " + SOCIETE.tvaintra, 105, 289.5, { align: "center" });
+    doc.text("Document de démonstration - maquette VANTURA · mentions [à compléter] avant mise en production", 105, 293.5, { align: "center" });
+  }
+  function cadreSignature(doc, d, y){
+    var sy = Math.min(y, 226);
+    doc.setDrawColor(PDF_C.LINE[0], PDF_C.LINE[1], PDF_C.LINE[2]);
+    doc.setLineWidth(.35);
+    doc.roundedRect(118, sy, 76, 44, 2.5, 2.5, "S");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(PDF_C.GDARK[0], PDF_C.GDARK[1], PDF_C.GDARK[2]);
+    doc.text("BON POUR ACCORD", 122, sy + 6);
+    if (d.signature && d.signature.img) {
+      try { doc.addImage(d.signature.img, "PNG", 122, sy + 9, 62, 20); } catch(e){}
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.2);
+      doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+      doc.text("Signé le " + d.signature.at, 122, sy + 34);
+      doc.text(String(d.signature.by || ""), 122, sy + 38);
+    } else {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.4);
+      doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+      doc.text("Date : ..............................", 122, sy + 14);
+      doc.text("Signature du client, précédée de la", 122, sy + 20);
+      doc.text("mention manuscrite « lu et approuvé » :", 122, sy + 24.5);
+    }
+    return sy + 48;
+  }
   function devisPDF(d, cl){
     var JS = window.jspdf && window.jspdf.jsPDF;
     if (!JS) return null;
     var doc = new JS({ unit: "mm", format: "a4" });
-    var GREEN = [125,182,63], GDARK = [63,122,46], INK = [27,42,33], MUT = [92,112,98], PALE = [239,246,228], LINE = [211,224,203];
-    var W = 210, ML = 18, MR = 192;
-
-    /* bandeau */
-    doc.setFillColor(PALE[0],PALE[1],PALE[2]);
-    doc.rect(0, 0, W, 44, "F");
-    var lj = logoJpeg();
-    if (lj) doc.addImage(lj, "JPEG", ML, 8, 28, 28);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(INK[0],INK[1],INK[2]);
-    doc.setFontSize(27);
-    doc.text("DEVIS", MR, 19, {align:"right"});
-    doc.setFontSize(10.5);
-    doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-    doc.setFont("helvetica", "normal");
-    doc.text(d.id + "  ·  émis le " + fmtD2(d.date), MR, 26, {align:"right"});
-    doc.text("Valable 30 jours", MR, 31.5, {align:"right"});
-
-    /* émetteur */
-    var y = 56;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11.5);
-    doc.setTextColor(INK[0],INK[1],INK[2]);
-    doc.text("EcoNet 974", ML, y);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9.5);
-    doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-    doc.text(["Nettoyage professionnel écoresponsable", "Sylvain Dalleau - Directeur", "0693 85 68 99 · econet974@gmail.com", "Île de La Réunion"], ML, y + 6, {lineHeightFactor: 1.5});
-
-    /* client */
-    doc.setFillColor(231,244,251);
-    doc.roundedRect(112, 48, 80, 33, 3, 3, "F");
-    doc.setFontSize(8);
-    doc.setTextColor(10,111,163);
-    doc.setFont("helvetica", "bold");
-    doc.text("ADRESSÉ À", 118, 55);
-    doc.setFontSize(10.5);
-    doc.setTextColor(INK[0],INK[1],INK[2]);
-    doc.text(cl.name, 118, 61.5);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-    doc.text(doc.splitTextToSize(cl.contact + "\n" + cl.site, 68), 118, 67, {lineHeightFactor: 1.45});
-
-    /* objet */
-    y = 92;
+    pdfEnTete(doc, PDF_C.PALE, "DEVIS", ["N° " + d.id, "Émis le " + fmtD2(d.date), "Validité : 30 jours · Devis gratuit"]);
+    var y = pdfParties(doc, cl);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
-    doc.setTextColor(INK[0],INK[1],INK[2]);
-    doc.text(doc.splitTextToSize("Objet : " + d.titre, 174), ML, y);
-
-    /* tableau */
-    y += 10;
-    var C = { des: ML, q: 128, pu: 158, tot: MR };
-    doc.setFillColor(GREEN[0],GREEN[1],GREEN[2]);
-    doc.rect(ML - 2, y - 5.5, 178, 8.5, "F");
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(8.5);
-    doc.text("DÉSIGNATION", C.des + 1, y);
-    doc.text("QTÉ", C.q, y, {align:"right"});
-    doc.text("PU HT", C.pu, y, {align:"right"});
-    doc.text("TOTAL HT", C.tot, y, {align:"right"});
-    y += 8;
+    doc.setTextColor(PDF_C.INK[0], PDF_C.INK[1], PDF_C.INK[2]);
+    doc.text(doc.splitTextToSize("Objet : " + d.titre, 174), 18, y);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(9.5);
-    d.lignes.forEach(function(l, i){
-      var lines = doc.splitTextToSize(String(l[0]), 100);
-      var rh = Math.max(8, lines.length * 4.6 + 3.5);
-      if (i % 2 === 1) {
-        doc.setFillColor(250,252,247);
-        doc.rect(ML - 2, y - 4.5, 178, rh, "F");
-      }
-      doc.setTextColor(INK[0],INK[1],INK[2]);
-      doc.text(lines, C.des + 1, y);
-      doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-      doc.text(String(l[1]), C.q, y, {align:"right"});
-      doc.text(eur(+l[2]), C.pu, y, {align:"right"});
-      doc.setTextColor(INK[0],INK[1],INK[2]);
-      doc.text(eur(l[1] * l[2]), C.tot, y, {align:"right"});
-      y += rh;
-      doc.setDrawColor(LINE[0],LINE[1],LINE[2]);
-      doc.setLineWidth(.25);
-      doc.line(ML - 2, y - 4.2, MR, y - 4.2);
-    });
-
-    /* totaux */
-    var t = devisTotals(d.lignes);
-    y += 4;
-    doc.setFillColor(250,252,247);
-    doc.roundedRect(118, y - 4, 74, 26, 2.5, 2.5, "F");
-    doc.setFontSize(9.5);
-    doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-    doc.text("Total HT", 123, y + 2);
-    doc.text(eur(t.ht), 187, y + 2, {align:"right"});
-    doc.text("TVA 8,5 % (La Réunion)", 123, y + 8);
-    doc.text(eur(t.tva), 187, y + 8, {align:"right"});
-    doc.setDrawColor(LINE[0],LINE[1],LINE[2]);
-    doc.line(123, y + 11.5, 187, y + 11.5);
+    doc.setFontSize(8);
+    doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+    doc.text("Date de début de la prestation : à convenir avec le client · Durée estimée : selon lignes ci-dessous.", 18, y + 6);
+    y = pdfTable(doc, d.lignes, y + 14);
+    y = pdfTotaux(doc, devisTotals(d.lignes), y + 4);
+    var condY = y + 2;
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(11.5);
-    doc.setTextColor(GDARK[0],GDARK[1],GDARK[2]);
-    doc.text("Total TTC", 123, y + 18);
-    doc.text(eur(t.ttc), 187, y + 18, {align:"right"});
-
-    /* conditions + pied */
-    y += 34;
+    doc.setFontSize(8);
+    doc.setTextColor(PDF_C.INK[0], PDF_C.INK[1], PDF_C.INK[2]);
+    doc.text("CONDITIONS", 18, condY);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.2);
-    doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-    doc.text(doc.splitTextToSize("Conditions : devis gratuit et sans engagement. Acompte de 30 % à la commande, solde à 30 jours. Produits écolabellisés inclus. Assurance responsabilité civile professionnelle. Bon pour accord : signature précédée de la mention « lu et approuvé ».", 174), ML, y, {lineHeightFactor: 1.5});
-    if (d.signature && d.signature.img) {
-      var sy = Math.min(y + 14, 236);
-      doc.setDrawColor(LINE[0],LINE[1],LINE[2]);
-      doc.setLineWidth(.35);
-      doc.roundedRect(124, sy, 68, 38, 2.5, 2.5, "S");
+    doc.setFontSize(7.4);
+    doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+    doc.text(doc.splitTextToSize(
+      "Acompte de 30 % à la commande, solde à réception de facture (30 jours). Escompte pour paiement anticipé : néant. " +
+      SOCIETE.assurance + ". Produits écolabellisés inclus. " +
+      "Clients particuliers : droit de rétractation de 14 jours pour tout devis signé hors établissement ; médiation de la consommation : [organisme à compléter]. " +
+      "Devis établi avant l'exécution de la prestation.", 94), 18, condY + 5, { lineHeightFactor: 1.45 });
+    cadreSignature(doc, d, condY - 2);
+    pdfPied(doc);
+    return doc;
+  }
+  function facturePDF(f, cl){
+    var JS = window.jspdf && window.jspdf.jsPDF;
+    if (!JS) return null;
+    var doc = new JS({ unit: "mm", format: "a4" });
+    var emise = f.date || (function(){ var x = new Date(f.echeance); x.setDate(x.getDate() - 30); return isoD(x); })();
+    var lignesTete = ["N° " + f.id, "Émise le " + fmtD2(emise)];
+    lignesTete.push(f.statut === "payee" ? "Acquittée" : "Échéance : " + fmtD2(f.echeance));
+    pdfEnTete(doc, PDF_C.BLEU, "FACTURE", lignesTete);
+    var y = pdfParties(doc, cl);
+    var refDevis = (cl.devis || []).filter(function(d){ return d.statut === "accepte"; }).map(function(d){ return d.id; });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+    doc.text("Prestation réalisée : " + f.titre + (refDevis.length ? " · Référence devis : " + refDevis.join(", ") : ""), 18, y);
+    var ht = f.montant / 1.085;
+    y = pdfTable(doc, [[f.titre, 1, Math.round(ht * 100) / 100]], y + 8);
+    y = pdfTotaux(doc, { ht: ht, tva: f.montant - ht, ttc: f.montant }, y + 4);
+    if (f.statut === "payee") {
+      doc.setDrawColor(PDF_C.GDARK[0], PDF_C.GDARK[1], PDF_C.GDARK[2]);
+      doc.setLineWidth(1);
+      doc.roundedRect(18, y, 58, 14, 2.5, 2.5, "S");
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(8);
-      doc.setTextColor(GDARK[0],GDARK[1],GDARK[2]);
-      doc.text("BON POUR ACCORD", 128, sy + 6);
-      try { doc.addImage(d.signature.img, "PNG", 128, sy + 8, 60, 18); } catch(e){}
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(7.2);
-      doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-      doc.text("Signé le " + d.signature.at, 128, sy + 31);
-      doc.text(String(d.signature.by || ""), 128, sy + 35);
+      doc.setFontSize(13);
+      doc.setTextColor(PDF_C.GDARK[0], PDF_C.GDARK[1], PDF_C.GDARK[2]);
+      doc.text("ACQUITTÉE", 47, y + 9, { align: "center" });
+    } else {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9.5);
+      doc.setTextColor(PDF_C.INK[0], PDF_C.INK[1], PDF_C.INK[2]);
+      doc.text("À régler avant le " + fmtD2(f.echeance) + " - virement ou chèque à l'ordre d'EcoNet 974.", 18, y + 4);
     }
-    doc.setFillColor(PALE[0],PALE[1],PALE[2]);
-    doc.rect(0, 281, W, 16, "F");
-    doc.setFontSize(8.5);
-    doc.setTextColor(GDARK[0],GDARK[1],GDARK[2]);
-    doc.setFont("helvetica", "bold");
-    doc.text("EcoNet 974 - Le propre, naturellement.", W / 2, 287.5, {align:"center"});
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7.2);
-    doc.setTextColor(MUT[0],MUT[1],MUT[2]);
-    doc.text("Document de démonstration - maquette VANTURA · contenus d'exemple · SIRET et mentions à compléter", W / 2, 292.5, {align:"center"});
+    doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
+    doc.text(doc.splitTextToSize(
+      "Conditions de règlement : paiement à 30 jours date d'émission. En cas de retard de paiement : pénalités égales à trois fois le taux d'intérêt légal (art. L441-10 C. com.) " +
+      "et, pour les professionnels, indemnité forfaitaire de recouvrement de 40 € (art. D441-5 C. com.). Escompte pour paiement anticipé : néant. " +
+      "TVA acquittée sur les débits - taux de 8,5 % applicable à La Réunion.", 176), 18, y + 20, { lineHeightFactor: 1.5 });
+    pdfPied(doc);
     return doc;
+  }
+  function factureOwner(id){
+    var cls = ptRead().clients;
+    for (var i = 0; i < cls.length; i++) {
+      var f = cls[i].factures.find(function(x){ return x.id === id; });
+      if (f) return { f: f, cl: cls[i] };
+    }
+    return null;
   }
   window.__pdfTest = function(){
     var c0 = ptRead().clients[0];
     var doc = devisPDF(c0.devis[0], c0);
     return doc ? doc.output("arraybuffer") : null;
   };
+  window.__pdfTestFacture = function(i){
+    var c0 = ptRead().clients[0];
+    var doc = facturePDF(c0.factures[i || 0], c0);
+    return doc ? doc.output("arraybuffer") : null;
+  };
   var pdfBusy = false;
-  function downloadDevis(id){
-    if (pdfBusy) return;
-    var o = devisOwner(id);
-    if (!o) return;
-    var d = o.d;
-    var doc = devisPDF(d, o.cl);
+  function deliverPDF(doc, filename, okMsg){
     if (!doc) { notify("Génération PDF indisponible (bibliothèque non chargée)."); return; }
     var blob = doc.output("blob");
-    var filename = d.id + ".pdf";
     pdfBusy = true;
     (async function(){
       try {
@@ -1213,7 +1295,7 @@
           if (dl) {
             try {
               await dl.save({ filename: filename, data: blob });
-              notify("Devis " + d.id + " enregistré en PDF ✅");
+              notify(okMsg);
             } catch(err) {
               if (err && err.code === "declined") notify("Téléchargement annulé.");
               else if (err && err.code === "rate_limited") notify("Une demande est déjà ouverte - réessayez dans un instant.");
@@ -1230,14 +1312,28 @@
           a.click();
           a.remove();
           setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
-          notify("Devis " + d.id + " téléchargé en PDF ✅");
+          notify(okMsg);
         }
       } finally { pdfBusy = false; }
     })();
   }
+  function downloadDevis(id){
+    if (pdfBusy) return;
+    var o = devisOwner(id);
+    if (!o) return;
+    deliverPDF(devisPDF(o.d, o.cl), o.d.id + ".pdf", "Devis " + o.d.id + " téléchargé en PDF ✅");
+  }
+  function downloadFacture(id){
+    if (pdfBusy) return;
+    var o = factureOwner(id);
+    if (!o) return;
+    deliverPDF(facturePDF(o.f, o.cl), o.f.id + ".pdf", "Facture " + o.f.id + " téléchargée en PDF ✅");
+  }
   document.addEventListener("click", function(e){
     var el = e.target.closest("[data-pdf]");
-    if (el) downloadDevis(el.dataset.pdf);
+    if (el) { downloadDevis(el.dataset.pdf); return; }
+    var fl = e.target.closest("[data-fpdf]");
+    if (fl) downloadFacture(fl.dataset.fpdf);
   });
 
   /* sync live du portail entre onglets */
