@@ -347,6 +347,8 @@
   .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media(max-width:560px){.frow{grid-template-columns:1fr}}
   .fgroup{margin-bottom:14px}
+  .frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  @media(max-width:760px){.frow3{grid-template-columns:1fr}}
   label{display:block;font-weight:600;font-size:13.5px;margin-bottom:7px;color:var(--ink)}
   input,select,textarea{width:100%;padding:13px 15px;border-radius:12px;border:2px solid var(--line);background:var(--white);font:inherit;font-size:15px;color:var(--ink);transition:border-color .2s}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue)}

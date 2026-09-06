@@ -851,6 +851,24 @@
           <div class="abox" id="fc-detail" hidden>
             <button class="doc-act" id="fc-back" style="background:none;border:none;padding:0;margin-bottom:14px;font-size:14px">‹ Retour au portefeuille</button>
             <h3>Fiche client - <span id="fc-name">…</span> <span class="cnt">liée en direct à son espace client</span></h3>
+            <div style="background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:18px">
+              <div class="frow3">
+                <div class="fgroup"><label for="fi-type">Type de client</label><select id="fi-type"><option value="pro">Professionnel / collectivité</option><option value="part">Particulier</option></select></div>
+                <div class="fgroup"><label for="fi-nom">Nom / structure *</label><input id="fi-nom"></div>
+                <div class="fgroup"><label for="fi-contact">Contact</label><input id="fi-contact" placeholder="Ex. : Mme Hoarau (gérante)"></div>
+              </div>
+              <div class="frow3">
+                <div class="fgroup"><label for="fi-tel">Téléphone</label><input id="fi-tel" placeholder="Ex. : 0692 00 00 00"></div>
+                <div class="fgroup"><label for="fi-email">Email</label><input id="fi-email" placeholder="Ex. : contact@client.re"></div>
+                <div class="fgroup"><label for="fi-siret">SIRET (si professionnel)</label><input id="fi-siret" placeholder="Ex. : 123 456 789 00012"></div>
+              </div>
+              <div class="frow">
+                <div class="fgroup"><label for="fi-site">Adresse d'intervention / contrat</label><input id="fi-site"></div>
+                <div class="fgroup"><label for="fi-adrfact">Adresse de facturation (si différente)</label><input id="fi-adrfact"></div>
+              </div>
+              <div class="fgroup"><label for="fi-notes">Notes internes - accès, codes, consignes (jamais visibles du client)</label><textarea id="fi-notes" style="min-height:64px"></textarea></div>
+              <button class="btn btn-p" id="fi-save" style="padding:11px 22px;font-size:14px">Enregistrer la fiche</button>
+            </div>
             <div class="fiche-grid">
               <div>
                 <label>Photos du chantier</label>
@@ -914,6 +932,28 @@
         </div>
 
         <div class="aview" data-view="reglages" hidden>
+          <div class="abox" style="margin-bottom:18px">
+            <h3>Ma société - informations officielles <span class="cnt">reprises sur les devis &amp; factures PDF</span></h3>
+            <div class="frow">
+              <div class="fgroup"><label for="so-nom">Nom commercial</label><input id="so-nom" placeholder="EcoNet 974"></div>
+              <div class="fgroup"><label for="so-forme">Forme juridique et capital</label><input id="so-forme" placeholder="Ex. : SASU au capital de 1 000 €"></div>
+            </div>
+            <div class="fgroup"><label for="so-adresse">Adresse du siège</label><input id="so-adresse" placeholder="Ex. : 10 rue du Général de Gaulle, 97400 Saint-Denis"></div>
+            <div class="frow">
+              <div class="fgroup"><label for="so-siret">SIRET</label><input id="so-siret" placeholder="Ex. : 123 456 789 00012"></div>
+              <div class="fgroup"><label for="so-rcs">RCS</label><input id="so-rcs" placeholder="Ex. : RCS Saint-Denis 123 456 789"></div>
+            </div>
+            <div class="frow">
+              <div class="fgroup"><label for="so-tva">N° TVA intracommunautaire</label><input id="so-tva" placeholder="Ex. : FR 12 123456789"></div>
+              <div class="fgroup"><label for="so-assur">Assurance RC Pro</label><input id="so-assur" placeholder="Ex. : AXA - contrat n° 0000000"></div>
+            </div>
+            <div class="frow">
+              <div class="fgroup"><label for="so-tel">Téléphone</label><input id="so-tel" placeholder="0693 85 68 99"></div>
+              <div class="fgroup"><label for="so-email">Email</label><input id="so-email" placeholder="econet974@gmail.com"></div>
+            </div>
+            <button class="btn btn-p" id="so-save" style="padding:11px 22px;font-size:14px">Enregistrer</button>
+            <p class="admin-note">Ces informations alimentent automatiquement l'en-tête, le pied de page et les mentions de tous les devis et factures PDF. Un champ vide s'affiche [à compléter] sur les documents.</p>
+          </div>
           <div class="admin-grid">
             <div class="abox">
               <h3>Synchronisation agenda</h3>

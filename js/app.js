@@ -534,11 +534,23 @@
     return name.replace(/[-·]/g, " ").split(/\s+/).filter(function(w){ return w.length > 2 || /^[A-Z0-9]/.test(w); })
       .slice(0, 2).map(function(w){ return w[0]; }).join("").toUpperCase();
   }
+  function societeSeed(){
+    return { nom: "EcoNet 974", forme: "", adresse: "", siret: "", rcs: "", tvaintra: "", assurance: "", tel: "0693 85 68 99", email: "econet974@gmail.com" };
+  }
+  function ptMigrate(st){
+    if (!st.societe) st.societe = societeSeed();
+    st.clients.forEach(function(c){
+      if (!c.type) c.type = "pro";
+      ["tel", "email", "adrFact", "siret", "notes"].forEach(function(k){ if (c[k] == null) c[k] = ""; });
+    });
+    return st;
+  }
   function portalSeed(){
     var today = new Date();
     function dOff(off){ var x = new Date(today); x.setDate(x.getDate() + off); return isoD(x); }
-    return { clients: [
+    return { societe: societeSeed(), clients: [
       { id: "alizes", name: "Résidence Les Alizés", contact: "M. Lebreton (syndic)", site: "12 rue des Filaos, Saint-Denis · contrat annuel",
+        type: "pro", tel: "0692 34 12 78", email: "syndic.alizes@orange.re", adrFact: "SDC Les Alizés, 12 rue des Filaos, 97400 Saint-Denis", siret: "824 512 367 00019", notes: "Accès par l'entrée de service. Gardien : M. Técher (06 92 55 10 22).",
         devis: [
           { id: "DEV-2026-041", titre: "Entretien des parties communes - contrat annuel", date: dOff(-24), statut: "accepte",
             lignes: [["Entretien hebdomadaire hall, escaliers, ascenseur (46 sem.)", 46, 120], ["Vitrerie trimestrielle", 4, 180], ["Sortie et nettoyage des bacs (hebdo)", 46, 25]] },
@@ -561,6 +573,7 @@
           { from: "econet", txt: "C'est noté - on la traite vendredi, sans supplément 👍", at: "Hier 15:11" }
         ] },
       { id: "grondin", name: "Cabinet dentaire Grondin", contact: "Dr Grondin", site: "Saint-Denis · bionettoyage 3×/sem.",
+        type: "pro", tel: "0262 21 44 09", email: "cabinet.grondin@gmail.com", adrFact: "", siret: "512 908 441 00027", notes: "Protocole bionettoyage validé avec le Dr Grondin - produits agréés uniquement.",
         devis: [
           { id: "DEV-2026-048", titre: "Bionettoyage du cabinet - contrat annuel", date: dOff(-15), statut: "accepte",
             lignes: [["Bionettoyage 3 passages/semaine (46 sem.)", 138, 45]] }
@@ -570,6 +583,7 @@
         photos: [["medical", "Salle de soins - après bionettoyage"]],
         messages: [{ from: "client", txt: "Pouvez-vous décaler le passage de jeudi à 6 h 30 ?", at: "Hier 09:12" }] },
       { id: "mairie", name: "Mairie annexe - Le Port", contact: "Service technique", site: "Le Port · gymnase + école",
+        type: "pro", tel: "0262 42 77 30", email: "services.techniques@leport.re", adrFact: "Mairie du Port, 58 rue de Saint-Paul, 97420 Le Port", siret: "219 740 057 00013", notes: "Marché public - bon de commande obligatoire avant toute intervention.",
         devis: [
           { id: "DEV-2026-051", titre: "Remise en état du gymnase", date: dOff(-4), statut: "attente",
             lignes: [["Décapage et métallisation du sol sportif", 1, 1450]] }
@@ -579,6 +593,7 @@
         photos: [["collectivites", "Couloir de l'école - entretien"]],
         messages: [] },
       { id: "horizon", name: "SARL Horizon Bureaux", contact: "Mme Payet", site: "Sainte-Marie · bureaux 2×/sem.",
+        type: "pro", tel: "0692 88 51 04", email: "compta@horizon-bureaux.re", adrFact: "", siret: "919 344 208 00011", notes: "Badge d'accès au local ménage remis à l'équipe (n° 4).",
         devis: [],
         factures: [{ id: "FAC-2026-129", titre: "Entretien bureaux - août 2026", montant: 389.90, statut: "due", echeance: dOff(3) }],
         planning: [{ d: dOff(1), t: "18:30", dur: "1 h 30", titre: "Entretien des bureaux", rec: "2×/semaine" }],
@@ -589,7 +604,7 @@
   var ptMem = null;
   function ptRead(){
     if (ptMem) return ptMem;
-    try { var raw = localStorage.getItem(PT_KEY); if (raw) { ptMem = JSON.parse(raw); return ptMem; } } catch(e){}
+    try { var raw = localStorage.getItem(PT_KEY); if (raw) { ptMem = ptMigrate(JSON.parse(raw)); return ptMem; } } catch(e){}
     ptMem = portalSeed();
     try { localStorage.setItem(PT_KEY, JSON.stringify(ptMem)); } catch(e){}
     return ptMem;
@@ -837,6 +852,10 @@
     if (!c) { FICHE_ID = null; return; }
     document.getElementById("fc-detail").dataset.cid = cid;
     document.getElementById("fc-name").textContent = c.name;
+    [["fi-type", c.type || "pro"], ["fi-nom", c.name], ["fi-contact", c.contact], ["fi-tel", c.tel || ""], ["fi-email", c.email || ""], ["fi-site", c.site], ["fi-adrfact", c.adrFact || ""], ["fi-siret", c.siret || ""], ["fi-notes", c.notes || ""]].forEach(function(p){
+      var el = document.getElementById(p[0]);
+      if (el) el.value = p[1];
+    });
     document.getElementById("fc-photos").innerHTML = c.photos.map(function(ph, i){
       return "<figure><img src='" + phSrc(ph) + "' alt=''><figcaption>" + ph[1] + "</figcaption><button class='ph-del' data-delphoto='" + i + "' aria-label='Retirer la photo'>✕</button></figure>";
     }).join("") || "<p class='admin-note'>Aucune photo pour l'instant.</p>";
@@ -946,6 +965,7 @@
       name: nom,
       contact: document.getElementById("nc-contact").value.trim() || "Contact à renseigner",
       site: document.getElementById("nc-site").value.trim() || "La Réunion",
+      type: "pro", tel: "", email: "", adrFact: "", siret: "", notes: "",
       devis: [], factures: [], planning: [], photos: [], messages: []
     };
     ptRead().clients.push(c);
@@ -956,6 +976,51 @@
     document.getElementById("nc-contact").value = "";
     document.getElementById("nc-site").value = "";
     notify("Client créé - sa fiche est prête : ajoutez un devis, des photos ou une facture ✅");
+  });
+
+  /* ----- réglages société + enregistrement de la fiche client ----- */
+  function fillSociete(){
+    var s = ptRead().societe || societeSeed();
+    [["so-nom", s.nom], ["so-forme", s.forme], ["so-adresse", s.adresse], ["so-siret", s.siret], ["so-rcs", s.rcs], ["so-tva", s.tvaintra], ["so-assur", s.assurance], ["so-tel", s.tel], ["so-email", s.email]].forEach(function(p){
+      var el = document.getElementById(p[0]);
+      if (el) el.value = p[1] || "";
+    });
+  }
+  fillSociete();
+  var soSave = document.getElementById("so-save");
+  if (soSave) soSave.addEventListener("click", function(){
+    var st = ptRead();
+    st.societe = {
+      nom: document.getElementById("so-nom").value.trim() || "EcoNet 974",
+      forme: document.getElementById("so-forme").value.trim(),
+      adresse: document.getElementById("so-adresse").value.trim(),
+      siret: document.getElementById("so-siret").value.trim(),
+      rcs: document.getElementById("so-rcs").value.trim(),
+      tvaintra: document.getElementById("so-tva").value.trim(),
+      assurance: document.getElementById("so-assur").value.trim(),
+      tel: document.getElementById("so-tel").value.trim(),
+      email: document.getElementById("so-email").value.trim()
+    };
+    ptWrite(st);
+    notify("Informations société enregistrées - vos prochains PDF les reprennent ✅");
+  });
+  var fiSave = document.getElementById("fi-save");
+  if (fiSave) fiSave.addEventListener("click", function(){
+    var c = ficheClient();
+    if (!c) return;
+    var nom = document.getElementById("fi-nom").value.trim();
+    if (!nom) { notify("Le nom du client est obligatoire."); return; }
+    c.name = nom;
+    c.type = document.getElementById("fi-type").value;
+    c.contact = document.getElementById("fi-contact").value.trim() || "Contact à renseigner";
+    c.tel = document.getElementById("fi-tel").value.trim();
+    c.email = document.getElementById("fi-email").value.trim();
+    c.siret = document.getElementById("fi-siret").value.trim();
+    c.site = document.getElementById("fi-site").value.trim() || "La Réunion";
+    c.adrFact = document.getElementById("fi-adrfact").value.trim();
+    c.notes = document.getElementById("fi-notes").value.trim();
+    ptWrite(ptRead());
+    notify("Fiche client enregistrée ✅");
   });
 
   /* ----- vue Devis : créateur multi-clients + liste globale ----- */
@@ -1031,16 +1096,20 @@
   });
 
   /* ----- PDF du devis (jsPDF + capability downloads) ----- */
-  var SOCIETE = {
-    nom: "EcoNet 974",
-    slogan: "Nettoyage professionnel écoresponsable",
-    forme: "Forme juridique et capital : [à compléter]",
-    adresse: "Siège : [adresse à compléter] - La Réunion",
-    immat: "SIRET : [à compléter] · RCS : [à compléter]",
-    tvaintra: "N° TVA intracommunautaire : [à compléter]",
-    contact: "0693 85 68 99 · econet974@gmail.com",
-    assurance: "Assurance RC Pro : [assureur à compléter] - couverture géographique : La Réunion"
-  };
+  function societePDF(){
+    var s = ptRead().societe || {};
+    function v(x, fb){ x = (x == null ? "" : String(x).trim()); return x || fb; }
+    return {
+      nom: v(s.nom, "EcoNet 974"),
+      slogan: "Nettoyage professionnel écoresponsable",
+      forme: "Forme juridique et capital : " + v(s.forme, "[à compléter]"),
+      adresse: "Siège : " + v(s.adresse, "[adresse à compléter] - La Réunion"),
+      immat: "SIRET : " + v(s.siret, "[à compléter]") + " · RCS : " + v(s.rcs, "[à compléter]"),
+      tvaintra: "N° TVA intracommunautaire : " + v(s.tvaintra, "[à compléter]"),
+      contact: v(s.tel, "0693 85 68 99") + " · " + v(s.email, "econet974@gmail.com"),
+      assurance: "Assurance RC Pro : " + v(s.assurance, "[assureur à compléter]") + " - couverture géographique : La Réunion"
+    };
+  }
   var PDF_C = { GREEN: [125,182,63], GDARK: [63,122,46], INK: [27,42,33], MUT: [92,112,98], PALE: [239,246,228], BLEU: [231,244,251], LINE: [211,224,203] };
   function logoJpeg(){
     try {
@@ -1075,6 +1144,7 @@
     lignes.forEach(function(l, i){ doc.text(l, 192, 24 + i * 5, { align: "right" }); });
   }
   function pdfParties(doc, cl){
+    var SOCIETE = societePDF();
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.setTextColor(PDF_C.INK[0], PDF_C.INK[1], PDF_C.INK[2]);
@@ -1095,7 +1165,12 @@
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.4);
     doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
-    doc.text(doc.splitTextToSize(cl.contact + "\n" + cl.site, 70), 117, 65.5, { lineHeightFactor: 1.45 });
+    var lignesCl = [cl.contact];
+    var joignable = [cl.tel, cl.email].filter(function(x){ return x; }).join(" · ");
+    if (joignable) lignesCl.push(joignable);
+    lignesCl.push(cl.adrFact || cl.site);
+    if (cl.siret) lignesCl.push("SIRET : " + cl.siret);
+    doc.text(doc.splitTextToSize(lignesCl.join("\n"), 70).slice(0, 5), 117, 65.5, { lineHeightFactor: 1.45 });
     return 94;
   }
   function pdfTable(doc, lignes, y){
@@ -1153,12 +1228,13 @@
     return y + 28;
   }
   function pdfPied(doc){
+    var SOCIETE = societePDF();
     doc.setFillColor(PDF_C.PALE[0], PDF_C.PALE[1], PDF_C.PALE[2]);
     doc.rect(0, 279, 210, 18, "F");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8.5);
     doc.setTextColor(PDF_C.GDARK[0], PDF_C.GDARK[1], PDF_C.GDARK[2]);
-    doc.text("EcoNet 974 - Le propre, naturellement.", 105, 285, { align: "center" });
+    doc.text(SOCIETE.nom + " - Le propre, naturellement.", 105, 285, { align: "center" });
     doc.setFont("helvetica", "normal");
     doc.setFontSize(6.8);
     doc.setTextColor(PDF_C.MUT[0], PDF_C.MUT[1], PDF_C.MUT[2]);
@@ -1195,6 +1271,7 @@
     var JS = window.jspdf && window.jspdf.jsPDF;
     if (!JS) return null;
     var doc = new JS({ unit: "mm", format: "a4" });
+    var SOCIETE = societePDF();
     pdfEnTete(doc, PDF_C.PALE, "DEVIS", ["N° " + d.id, "Émis le " + fmtD2(d.date), "Validité : 30 jours · Devis gratuit"]);
     var y = pdfParties(doc, cl);
     doc.setFont("helvetica", "bold");
@@ -1231,6 +1308,7 @@
     var emise = f.date || (function(){ var x = new Date(f.echeance); x.setDate(x.getDate() - 30); return isoD(x); })();
     var lignesTete = ["N° " + f.id, "Émise le " + fmtD2(emise)];
     lignesTete.push(f.statut === "payee" ? "Acquittée" : "Échéance : " + fmtD2(f.echeance));
+    var SOCIETE = societePDF();
     pdfEnTete(doc, PDF_C.BLEU, "FACTURE", lignesTete);
     var y = pdfParties(doc, cl);
     var refDevis = (cl.devis || []).filter(function(d){ return d.statut === "accepte"; }).map(function(d){ return d.id; });
@@ -1253,7 +1331,7 @@
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9.5);
       doc.setTextColor(PDF_C.INK[0], PDF_C.INK[1], PDF_C.INK[2]);
-      doc.text("À régler avant le " + fmtD2(f.echeance) + " - virement ou chèque à l'ordre d'EcoNet 974.", 18, y + 4);
+      doc.text("À régler avant le " + fmtD2(f.echeance) + " - virement ou chèque à l'ordre de " + SOCIETE.nom + ".", 18, y + 4);
     }
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7.2);
