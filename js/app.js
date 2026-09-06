@@ -125,7 +125,9 @@
     });
     setNav(navKey);
     document.title = title || page.dataset.title;
-    scrollTo({top:0, behavior:"instant" in window ? "instant" : "auto"});
+    document.documentElement.style.scrollBehavior = "auto";
+    scrollTo(0, 0);
+    document.documentElement.style.scrollBehavior = "";
     observePage(page);
     closeMenu();
     pageHook(key);
@@ -1047,7 +1049,7 @@
       b.style.width = b.style.height = s + "px";
       b.style.left = (18 + Math.random()*64) + "%";
       b.style.top = (16 + Math.random()*64) + "%";
-      b.style.animationDelay = (1.35 + Math.random()*.5) + "s";
+      b.style.animationDelay = (2.0 + Math.random()*.6) + "s";
       stage.appendChild(b);
     }
     var doneCalled = false, raf = 0;
@@ -1131,7 +1133,7 @@
       { x0: 1.15 * W,  y0: 0.46 * H, x1: -0.15 * W, y1: 0.58 * H, bow: 0.05 * H },
       { x0: -0.15 * W, y0: 0.80 * H, x1: 1.15 * W, y1: 0.92 * H, bow: -0.04 * H }
     ];
-    var T_START = 350, DUR = 330, LIFT = 70;
+    var T_START = 520, DUR = 520, LIFT = 90;
     var t0 = null, lastP = null, lastStreak = 0, flying = false;
 
     function qpoint(s, t){
@@ -1191,7 +1193,7 @@
       raf = requestAnimationFrame(frame);
     }
     raf = requestAnimationFrame(frame);
-    setTimeout(done, 2600);
+    setTimeout(done, 3600);
   })();
 
   /* ----- Guide de defilement ----- */

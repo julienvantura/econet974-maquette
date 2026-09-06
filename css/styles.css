@@ -408,7 +408,7 @@
   #loader.ld-gone{display:none}
   .ld-stage{position:relative;text-align:center;padding:20px}
   .ld-logo{width:min(320px,62vw);margin:0 auto;filter:drop-shadow(0 14px 30px rgba(27,42,33,.18))}
-  .ld-tag{margin-top:10px;font-family:var(--display);font-weight:600;font-size:clamp(20px,3.4vw,30px);color:var(--ink);opacity:0;transform:translateY(14px);animation:ldtag .6s 1.5s cubic-bezier(.22,1,.36,1) forwards}
+  .ld-tag{margin-top:10px;font-family:var(--display);font-weight:600;font-size:clamp(20px,3.4vw,30px);color:var(--ink);opacity:0;transform:translateY(14px);animation:ldtag .6s 2.3s cubic-bezier(.22,1,.36,1) forwards}
   .ld-tag em{font-style:normal;color:var(--green-deep)}
   @keyframes ldtag{to{opacity:1;transform:none}}
   .ld-grime{
